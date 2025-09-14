@@ -1,0 +1,13 @@
+{% extends "email/base_email.html" %}
+{% block body %}
+<tr>
+  <td style="padding:24px;">
+    <h1 style="margin:0 0 12px;font-size:20px;color:#e2e8f0;">Welcome, {{ username }}!</h1>
+    <p style="margin:0 0 12px;line-height:1.6;color:#cbd5e1;">
+      Your KYC verification has been <strong style="color:#34d399;">approved</strong>.
+      You can now sign in and start trading.
+    </p>
+    <p style="margin:0;"><a href="{{ site_url }}" style="color:#60a5fa;text-decoration:none;">Go to dashboard →</a></p>
+  </td>
+</tr>
+{% endblock %}

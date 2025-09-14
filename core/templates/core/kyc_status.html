@@ -1,0 +1,63 @@
+{% load static %}
+{% load i18n %}
+{% load l10n %}
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>KYC Status — Tronexi</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    body{
+      font-family:Poppins,system-ui;background:#0f172a;color:#fff;
+      display:flex;align-items:center;justify-content:center;min-height:100vh;
+      margin:0;padding:24px
+    }
+    .card{
+      background:rgba(255,255,255,0.06);
+      border:1px solid rgba(255,255,255,0.08);
+      border-radius:14px;max-width:520px;width:100%;
+      padding:24px;box-shadow:0 10px 30px rgba(0,0,0,.4);text-align:center
+    }
+    h1{margin:0 0 8px}
+    p{color:#cbd5e1;margin:8px 0}
+    .pill{
+      display:inline-flex;align-items:center;gap:8px;
+      background:rgba(16,185,129,.15);border:1px solid rgba(16,185,129,.3);
+      color:#a7f3d0;padding:8px 12px;border-radius:24px;margin-top:12px
+    }
+    .btn{
+      display:inline-flex;align-items:center;justify-content:center;
+      padding:10px 16px;border-radius:10px;font-weight:600;border:0;cursor:pointer
+    }
+    .btn-logout{background:#e11d48;color:#fff}
+    .btn-logout:hover{background:#be123c}
+    .btn-refresh{background:#334155;color:#fff;margin-left:8px}
+    .btn-refresh:hover{background:#475569}
+    .btn-row{margin-top:14px}
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>{% trans "Verification in Progress" %}</h1>
+    <p>{% blocktrans %}Thanks, {{ kyc.full_name }}. Your ID is <strong>under review{% endblocktrans %}</strong>.</p>
+    <div class="pill">⏳ Status: Pending Review</div>
+    <p style="margin-top:12px">
+      {% blocktrans %}We’ll email you when it’s approved. You’ll be able to access your dashboard after approval.{% endblocktrans %}
+    </p>
+
+    <div class="btn-row">
+      <!-- Proper POST logout -->
+      <form method="post" action="{% url 'logout' %}" style="display:inline;">
+        {% csrf_token %}
+        <!-- Use the named 'home' so i18n prefixes (e.g. /en/) are respected -->
+        <input type="hidden" name="next" value="{% url 'home' %}" />
+        <button class="btn btn-logout" type="submit">Log out</button>
+      </form>
+
+      <!-- Refresh the status page -->
+      <a class="btn btn-refresh" href="{% url 'kyc_status' %}">Refresh</a>
+    </div>
+  </div>
+</body>
+</html>

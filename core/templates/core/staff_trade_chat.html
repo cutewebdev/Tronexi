@@ -1,0 +1,252 @@
+{% load static %}
+{% load i18n %}
+{% load l10n %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Staff Chat — Trade #{{ trade.id }} ({{ trade.vendor.name }})</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-900 text-slate-100 min-h-screen">
+
+  <header class="border-b border-slate-800 sticky top-0 bg-slate-900/80 backdrop-blur z-40">
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <h1 class="text-lg font-semibold">Staff Chat — Trade #{{ trade.id }} ({{ trade.vendor.name }})</h1>
+      <div class="text-sm text-slate-400">Admin</div>
+    </div>
+  </header>
+
+  <main class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+    <div class="rounded-xl border border-slate-800 bg-slate-900 p-5">
+      <div class="flex items-center justify-between mb-3">
+        <div class="text-sm text-slate-400">
+          You’re chatting as <span class="font-semibold text-slate-200">{{ request.user.username }}</span>.
+        </div>
+        <div id="chatStatus" class="hidden text-xs">
+          <span id="chatDot" class="inline-block h-2 w-2 rounded-full bg-slate-500 align-middle"></span>
+          <span id="chatStatusText" class="align-middle ml-1">…</span>
+        </div>
+      </div>
+
+      <!-- Messages -->
+      <div id="chatMessages" class="chat-scroll border border-slate-800 rounded-lg bg-slate-950">
+        <div id="chatList" class="space-y-2"></div>
+      </div>
+
+      <!-- Input -->
+      <div class="mt-4 flex items-center gap-2">
+        <input id="chat-message-input" type="text" placeholder="Type a message…"
+               class="flex-1 rounded border border-slate-800 bg-slate-800 text-white p-3 outline-none focus:ring-2 focus:ring-indigo-600">
+        <button id="chat-message-submit"
+                class="px-4 py-3 rounded bg-indigo-600 hover:bg-indigo-700 font-semibold">
+          Send
+        </button>
+      </div>
+    </div>
+  </main>
+
+  <style>
+    .chat-scroll { min-height: 260px; max-height: 70vh; overflow-y: auto; padding: 12px 14px; }
+  </style>
+
+  <script>
+(function(){
+  const tradeId   = "{{ trade.id }}";
+  // Staff "me" should be the vendor's name (server broadcasts staff msgs as vendor)
+  const me        = "{{ trade.vendor.name|escapejs }}";
+  const protocol  = (window.location.protocol === "https:" ? "wss" : "ws");
+  const socketURL = protocol + "://" + window.location.host + "/ws/chat/" + tradeId + "/";
+
+  // Elements
+  const wrap    = document.getElementById('chatMessages') || document.getElementById('chat-box');
+  const list    = document.getElementById('chatList') || wrap;
+  const input   = document.getElementById('chat-message-input');
+  const sendBtn = document.getElementById('chat-message-submit');
+
+  const statusBox = document.getElementById('chatStatus');
+  const statusDot = document.getElementById('chatDot');
+  const statusTxt = document.getElementById('chatStatusText');
+  const pill      = document.getElementById('newMsgBar'); // optional “jump to latest” pill
+
+  // ---- helpers ----
+  function showStatus(txt, color){
+    if (!statusBox || !statusDot || !statusTxt) return;
+    statusBox.classList.remove('hidden');
+    statusTxt.textContent = txt || '';
+    statusDot.className = 'inline-block h-2 w-2 rounded-full ' + (color || 'bg-slate-500');
+  }
+
+  // Tiny notification beep for inbound msgs
+  function playNotify(){
+    try {
+      const Ctx = window.AudioContext || window.webkitAudioContext;
+      if (!Ctx) return;
+      const ctx = new Ctx();
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'sine';
+      osc.frequency.value = 880;     // short, clean ping
+      gain.gain.value = 0.06;
+      osc.connect(gain); gain.connect(ctx.destination);
+      osc.start();
+      setTimeout(function(){ osc.stop(); ctx.close(); }, 120);
+    } catch(_) {}
+  }
+
+  // Scroll helpers (with optional “new message” pill)
+  let stickToBottom = true;
+
+  function isNearBottom(el){
+    if (!el) return true;
+    var threshold = 60; // px
+    return (el.scrollHeight - el.scrollTop - el.clientHeight) < threshold;
+  }
+  function scrollToBottom(){
+    if (!wrap) return;
+    wrap.scrollTop = wrap.scrollHeight;
+  }
+  function maybeAutoScroll(){
+    if (!wrap) return;
+    if (stickToBottom) {
+      scrollToBottom();
+      if (pill) pill.classList.add('hidden');
+    } else {
+      if (pill) pill.classList.remove('hidden');
+    }
+  }
+  if (wrap) {
+    wrap.addEventListener('scroll', function(){
+      stickToBottom = isNearBottom(wrap);
+      if (pill) pill.classList.toggle('hidden', stickToBottom);
+    });
+  }
+  if (pill) {
+    pill.addEventListener('click', function(){
+      stickToBottom = true;
+      scrollToBottom();
+      pill.classList.add('hidden');
+    });
+  }
+
+  // Render a message bubble (with System style)
+  function appendMsg(sender, msg){
+    if (!list) return;
+
+    // System banner
+    if (sender === "System") {
+      const row = document.createElement('div');
+      row.className = "flex justify-center";
+      row.innerHTML =
+        '<div class="text-xs px-3 py-1 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/30">' +
+        msg +
+        '</div>';
+      list.appendChild(row);
+      maybeAutoScroll();
+      return;
+    }
+
+    const mine = (sender && sender.toString() === me);
+    const row  = document.createElement('div');
+    row.className = "flex " + (mine ? "justify-end" : "justify-start");
+
+    const bubble = document.createElement('div');
+    bubble.className = "max-w-[80%] px-3 py-2 rounded-lg text-sm " +
+      (mine
+        ? "bg-indigo-600 text-white rounded-br-none"
+        : "bg-slate-800 text-slate-100 border border-slate-700 rounded-bl-none");
+    bubble.innerHTML = '<span class="block text-[11px] opacity-80 mb-0.5">' +
+                       (sender || "User") +
+                       '</span>' + msg;
+    row.appendChild(bubble);
+    list.appendChild(row);
+
+    maybeAutoScroll();
+  }
+
+  // ---- WebSocket ----
+  let socket;
+  try {
+    socket = new WebSocket(socketURL);
+    showStatus('Connecting…', 'bg-amber-500');
+  } catch (e) {
+    appendMsg("System", "<span class='text-rose-400'>Error opening chat.</span>");
+    showStatus('Error', 'bg-rose-500');
+  }
+
+  if (socket) {
+    socket.onopen = function(){
+      showStatus('Connected', 'bg-emerald-500');
+      scrollToBottom();
+    };
+
+    socket.onmessage = function(e){
+      try {
+        const data    = JSON.parse(e.data || "{}");
+        const sender  = data.sender  || "User";
+        const message = data.message || "";
+
+        appendMsg(sender, message);
+
+        // Normalize names for safe comparison
+        function norm(s){ return (s || "").toString().trim().toLowerCase(); }
+        const isMine   = norm(sender) === norm(me);
+        const isSystem = norm(sender) === "system";
+
+        // Play sound only for incoming (or system) messages
+        if (!isMine || isSystem) {
+          playNotify();
+        }
+
+        // Keep scroll behavior stable
+        if (typeof maybeAutoScroll === "function") {
+          maybeAutoScroll();
+        } else if (wrap) {
+          wrap.scrollTop = wrap.scrollHeight;
+        }
+      } catch (err) {
+        appendMsg("System", "<span class='text-amber-400'>Received malformed message.</span>");
+        playNotify();
+      }
+    };
+
+    socket.onerror = function(){
+      appendMsg("System", "<span class='text-rose-400'>Chat connection error.</span>");
+      showStatus('Error', 'bg-rose-500');
+    };
+
+    socket.onclose = function(){
+      appendMsg("System", "<span class='text-amber-400'>Chat disconnected.</span>");
+      showStatus('Disconnected', 'bg-slate-500');
+    };
+  }
+
+  // ---- Send (no local echo; server broadcasts once) ----
+  function send(){
+    var message = (input && input.value ? input.value : "").trim();
+    if (!message || !socket || socket.readyState !== 1) return;
+    socket.send(JSON.stringify({ message: message }));
+    input.value = "";
+  }
+
+  if (sendBtn) sendBtn.addEventListener('click', send);
+  if (input) {
+    input.addEventListener('keydown', function(e){
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        send();
+      }
+    });
+  }
+
+  // Start pinned to bottom on first paint
+  document.addEventListener('DOMContentLoaded', function(){
+    setTimeout(scrollToBottom, 0);
+  });
+})();
+</script>
+
+
+</body>
+</html>

@@ -1,0 +1,233 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-08-05 11:48+0100\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: .\core\templates\core\home.html:42
+msgid "Welcome to Tronexi"
+msgstr ""
+
+#: .\core\templates\core\home.html:109
+msgid "of Decentralized Trading"
+msgstr ""
+
+#: .\core\templates\core\home.html:111
+msgid "Join Tronexi – secure, fast, with access to global P2P traders."
+msgstr ""
+
+#: .\core\templates\core\home.html:112
+msgid "Get Started"
+msgstr ""
+
+#: .\core\templates\core\home.html:118
+msgid "What Our Users Say"
+msgstr ""
+
+#: .\core\templates\core\home.html:121
+msgid "Tronexi changed the way I trade. It's fast, secure, and so easy to use."
+msgstr ""
+
+#: .\core\templates\core\home.html:122
+msgid "– Elsie A."
+msgstr ""
+
+#: .\core\templates\core\home.html:125
+msgid "The escrow system and fast support gave me peace of mind."
+msgstr ""
+
+#: .\core\templates\core\home.html:126
+msgid "– Arnfried K."
+msgstr ""
+
+#: .\core\templates\core\home.html:129
+msgid "Best P2P platform I've ever used. Smooth experience!"
+msgstr ""
+
+#: .\core\templates\core\home.html:130
+msgid "– Emily L."
+msgstr ""
+
+#: .\core\templates\core\home.html:153
+msgid "100K+"
+msgstr ""
+
+#: .\core\templates\core\home.html:154
+msgid "Active Users"
+msgstr ""
+
+#: .\core\templates\core\home.html:157
+msgid "$250M+"
+msgstr ""
+
+#: .\core\templates\core\home.html:158
+msgid "Volume Traded"
+msgstr ""
+
+#: .\core\templates\core\home.html:161
+#, python-format
+msgid "99.99%%"
+msgstr ""
+
+#: .\core\templates\core\home.html:162
+msgid "Uptime"
+msgstr ""
+
+#: .\core\templates\core\home.html:165
+msgid "140+"
+msgstr ""
+
+#: .\core\templates\core\home.html:166
+msgid "Supported Countries"
+msgstr ""
+
+#: .\core\templates\core\home.html:173
+msgid "Explore Our Core Features"
+msgstr ""
+
+#: .\core\templates\core\home.html:177
+msgid "Secure Trading"
+msgstr ""
+
+#: .\core\templates\core\home.html:178
+msgid "P2P Escrow"
+msgstr ""
+
+#: .\core\templates\core\home.html:179
+msgid "Vendor System"
+msgstr ""
+
+#: .\core\templates\core\home.html:180
+msgid "Copy Trading"
+msgstr ""
+
+#: .\core\templates\core\home.html:186
+msgid ""
+"Tronexi provides end-to-end encrypted trading to ensure your data and "
+"transactions remain secure, private, and tamper-proof."
+msgstr ""
+
+#: .\core\templates\core\home.html:189
+msgid ""
+"Our peer-to-peer escrow system ensures funds are safely held until both "
+"parties complete their side of the trade."
+msgstr ""
+
+#: .\core\templates\core\home.html:192
+msgid ""
+"Become a verified vendor and sell to thousands of users directly on the "
+"Tronexi platform with zero hidden fees."
+msgstr ""
+
+#: .\core\templates\core\home.html:195
+msgid ""
+"Copy top traders' strategies automatically. Set commissions and grow "
+"passively while others follow your trades."
+msgstr ""
+
+#: .\core\templates\core\home.html:203
+msgid "Crypto Converter"
+msgstr ""
+
+#: .\core\templates\core\home.html:238
+msgid "Live data via CoinGecko API"
+msgstr ""
+
+#: .\core\templates\core\home.html:244
+msgid "Users in 140+ Countries and Regions"
+msgstr ""
+
+#: .\core\templates\core\home.html:254
+msgid "How It Works"
+msgstr ""
+
+#: .\core\templates\core\home.html:258
+msgid "Sign Up"
+msgstr ""
+
+#: .\core\templates\core\home.html:259
+msgid "Create your Tronexi account in just a few steps."
+msgstr ""
+
+#: .\core\templates\core\home.html:263
+msgid "Fund your trading account"
+msgstr ""
+
+#: .\core\templates\core\home.html:264
+msgid ""
+"Fund your account by making payment to the stated wallet address attached to "
+"your account."
+msgstr ""
+
+#: .\core\templates\core\home.html:268
+msgid "Trade Securely"
+msgstr ""
+
+#: .\core\templates\core\home.html:269
+msgid "Use our escrow system to complete your trade safely."
+msgstr ""
+
+#: .\core\templates\core\home.html:286
+msgid "Why Tronexi?"
+msgstr ""
+
+#: .\core\templates\core\home.html:301
+msgid "Download the Tronexi App"
+msgstr ""
+
+#: .\core\templates\core\home.html:302
+msgid "Trade anytime, anywhere. Get the app directly from our website."
+msgstr ""
+
+#: .\core\templates\core\home.html:314
+msgid "Our Partners"
+msgstr ""
+
+#: .\core\templates\core\home.html:358
+msgid "Quick Links"
+msgstr ""
+
+#: .\core\templates\core\home.html:360
+msgid "Features"
+msgstr ""
+
+#: .\core\templates\core\home.html:361
+msgid "Testimonials"
+msgstr ""
+
+#: .\core\templates\core\home.html:362
+msgid "Partners"
+msgstr ""
+
+#: .\core\templates\core\home.html:363
+msgid "Download App"
+msgstr ""
+
+#: .\core\templates\core\home.html:369
+msgid "Contact Us"
+msgstr ""
+
+#: .\core\templates\core\home.html:372
+msgid "UK Headquarters"
+msgstr ""
+
+#: .\core\templates\core\home.html:376
+msgid "Stay Updated"
+msgstr ""
+
+#: .\core\templates\core\home.html:379
+msgid "Subscribe"
+msgstr ""

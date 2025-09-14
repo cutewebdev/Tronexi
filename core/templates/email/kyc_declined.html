@@ -1,0 +1,14 @@
+{% extends "email/base_email.html" %}
+{% block body %}
+<tr>
+  <td style="padding:24px;">
+    <h1 style="margin:0 0 12px;font-size:20px;color:#e2e8f0;">KYC Declined</h1>
+    <p style="margin:0 0 12px;line-height:1.6;color:#cbd5e1;">
+      Unfortunately your documents didn’t meet our verification standards. This is often caused by
+      blurred images, glare, or incomplete capture. Please re-register and submit clear photos of your
+      ID and selfie. We’ll review quickly.
+    </p>
+    <p style="margin:0;"><a href="{{ site_url }}" style="color:#60a5fa;text-decoration:none;">Try again →</a></p>
+  </td>
+</tr>
+{% endblock %}

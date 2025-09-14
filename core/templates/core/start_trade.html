@@ -1,0 +1,167 @@
+{% load static %}
+{% load i18n %}
+{% load l10n %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Start P2P Trade — {{ vendor.name }}</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="min-h-screen bg-slate-950 text-slate-100">
+
+  <!-- Header -->
+  <header class="border-b border-slate-800/70">
+    <div class="max-w-6xl mx-auto px-4 py-5 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <img src="{% static 'image/avatar.png' %}" alt="Logo" class="w-9 h-9 rounded-full border border-slate-800 object-cover">
+        <img src="{% static 'image/logo_nextwhite.png' %}" alt="Tronexi" class="h-12 sm:h-14 md:h-10 ig:h-18 w-auto object-contain" />
+      </div>
+      <div class="flex items-center gap-3">
+        <a href="{% url 'vendor_list' %}" class="text-sm text-slate-300 hover:text-white underline">Back to Vendors</a>
+        <a href="{% url 'dashboard' %}" class="text-sm text-slate-300 hover:text-white underline">Dashboard</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-6xl mx-auto px-4 py-8 md:py-12">
+    <div class="grid md:grid-cols-5 gap-6">
+
+      <!-- Vendor card -->
+      <aside class="md:col-span-2">
+        <div class="rounded-xl border border-slate-800 bg-slate-900 p-5">
+          <div class="flex items-center gap-3">
+            {% if vendor.image %}
+              <img src="{{ vendor.image.url }}" alt="{{ vendor.name }}" class="w-12 h-12 rounded-lg object-cover border border-slate-800">
+            {% else %}
+              <div class="w-12 h-12 rounded-lg bg-slate-800 border border-slate-700 flex items-center justify-center text-lg font-bold">
+                {{ vendor.name|first|upper }}
+              </div>
+            {% endif %}
+            <div>
+              <div class="text-lg font-semibold">{{ vendor.name }}</div>
+              <div class="text-xs text-slate-400">
+                {{ vendor.get_location_display|default:"Global" }}
+              </div>
+            </div>
+          </div>
+
+          <div class="mt-4 flex items-center gap-2">
+            {% if vendor.verified %}
+              <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-emerald-300 bg-emerald-400/10 border border-emerald-400/20 text-xs">
+                <!-- check icon -->
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/>
+                </svg>
+                Verified Vendor
+              </span>
+            {% else %}
+              <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-amber-300 bg-amber-400/10 border border-amber-400/20 text-xs">
+                <!-- alert icon -->
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3m0 3h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/>
+                </svg>
+                Unverified
+              </span>
+            {% endif %}
+          </div>
+
+          <div class="mt-5 text-sm text-slate-300 space-y-2">
+            <p>{% blocktrans %}Escrow will hold the crypto during payment. Keep all conversation and payment proof inside Tronexi chat.{% endblocktrans %}</p>
+            <p>{% blocktrans %}If something seems off, don’t proceed and open a dispute from the trade room.{% endblocktrans %}</p>
+          </div>
+        </div>
+      </aside>
+
+      <!-- Start trade form -->
+      <section class="md:col-span-3">
+        <div class="rounded-xl border border-slate-800 bg-slate-900 p-6">
+          <h2 class="text-xl font-semibold">{% trans "Start Trade" %}</h2>
+          <p class="text-sm text-slate-400 mt-1">{% trans "Enter the amount you want to trade with" %} <span class="font-medium text-slate-200">{{ vendor.name }}</span>.</p>
+
+          <form method="post" class="mt-6 space-y-5">
+            {% csrf_token %}
+
+            <div>
+              <label for="amount" class="block text-sm mb-1">Amount</label>
+              <div class="relative">
+                <input
+                  id="amount"
+                  name="amount"
+                  type="number"
+                  min="1"
+                  step="any"
+                  placeholder="Enter amount"
+                  class="w-full rounded-lg border border-slate-700 bg-slate-800 text-white p-3 pr-12 focus:outline-none focus:border-emerald-500"
+                  required
+                />
+                <div class="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 text-sm">
+                  {{ request.user.currency|default:"GBP" }}
+                </div>
+              </div>
+              <p class="mt-1 text-xs text-slate-400">Your currency: {{ request.user.currency|default:"GBP" }}</p>
+            </div>
+
+            <div class="rounded-lg border border-slate-800 bg-slate-800/40 p-4">
+              <div class="text-sm font-medium mb-2">Before you proceed</div>
+              <ul class="text-sm text-slate-300 list-disc pl-5 space-y-1">
+                <li>{% blocktrans %}Pay only the account shared inside Tronexi chat by this vendor.{% endblocktrans %}</li>
+                <li>{% trans "Upload a clear payment proof if requested" %}.</li>
+                <li>{% trans "Never move the conversation off-platform" %}.</li>
+              </ul>
+
+              <label class="mt-3 flex items-center gap-2 text-sm">
+                <input type="checkbox" required class="h-4 w-4 rounded border-slate-600 bg-slate-800">
+                <span>{% trans "I agree to follow P2P safety rules." %}</span>
+              </label>
+            </div>
+
+            <div class="flex items-center gap-3">
+              <a href="{% url 'vendor_list' %}" class="px-4 py-2 rounded-lg border border-slate-700 text-slate-200 hover:bg-slate-800">Cancel</a>
+              <button type="submit" class="px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-semibold">
+                {% trans "Proceed to Trade Room" %}
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Steps / hint panel -->
+        <div class="mt-6 grid sm:grid-cols-3 gap-4">
+          <div class="rounded-lg border border-slate-800 bg-slate-900 p-4">
+            <div class="text-sm font-medium">1) Enter amount</div>
+            <p class="text-xs text-slate-400 mt-1">Use your preferred currency.</p>
+          </div>
+          <div class="rounded-lg border border-slate-800 bg-slate-900 p-4">
+            <div class="text-sm font-medium">2) Chat & Pay</div>
+            <p class="text-xs text-slate-400 mt-1">Pay vendor and keep proofs in chat.</p>
+          </div>
+          <div class="rounded-lg border border-slate-800 bg-slate-900 p-4">
+            <div class="text-sm font-medium">3) Release</div>
+            <p class="text-xs text-slate-400 mt-1">Crypto releases after confirmation.</p>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <footer class="border-t border-slate-800/70">
+    <div class="max-w-6xl mx-auto px-4 py-6 text-center text-xs text-slate-400">
+      &copy; {{ now.year|default:2025 }} Tronexi — P2P Trading. All rights reserved.
+    </div>
+  </footer>
+
+  <!-- Tawk.to -->
+  <script type="text/javascript">
+  var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date();
+  (function(){
+    var s1=document.createElement("script"),s0=document.getElementsByTagName("script")[0];
+    s1.async=true;
+    s1.src='https://embed.tawk.to/688a2b5d4870571920646522/1j1dripnt';
+    s1.charset='UTF-8';
+    s1.setAttribute('crossorigin','*');
+    s0.parentNode.insertBefore(s1,s0);
+  })();
+  </script>
+</body>
+</html>

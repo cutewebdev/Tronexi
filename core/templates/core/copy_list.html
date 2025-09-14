@@ -1,0 +1,241 @@
+{% load static %}
+{% load i18n %}
+{% load l10n %}
+{% load dict_extras %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Copy Trading</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <!-- Tailwind (remove if you already include it globally) -->
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-slate-900 text-slate-100 min-h-screen">
+
+  <!-- Header / Breadcrumb -->
+  <header class="sticky top-0 z-30 border-b border-slate-800 bg-slate-900/80 backdrop-blur">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <a href="{% url 'dashboard' %}" class="inline-flex items-center gap-2 text-slate-300 hover:text-white">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+          </svg>
+          {% trans "Back to Dashboard" %}
+        </a>
+      </div>
+      <div class="text-sm text-slate-400">{% trans "Copy Trading" %}</div>
+    </div>
+  </header>
+
+  <main class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
+
+    <!-- Title + Search -->
+    <div class="rounded-2xl border border-slate-800 bg-slate-900 p-5">
+      <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <h1 class="text-xl font-semibold">{% trans "Mirror top traders" %}</h1>
+          <p class="text-slate-400 text-sm mt-1">
+            {% blocktrans %}Choose a verified expert to automatically copy their positions. Stop anytime.{% endblocktrans %}
+          </p>
+        </div>
+
+        <!-- Search Bar -->
+        <div class="w-full sm:w-80 relative">
+          <span class="pointer-events-none absolute inset-y-0 left-3 flex items-center">
+            <svg class="h-4 w-4 text-slate-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                 stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                 d="M21 21l-4.35-4.35M10 18a8 8 0 100-16 8 8 0 000 16z"/></svg>
+          </span>
+          <input id="expertSearch" type="text" placeholder="Search experts by name…"
+                 aria-label="Search experts"
+                 class="w-full pl-9 pr-9 py-2.5 rounded-xl bg-slate-800 border border-slate-700
+                        text-slate-100 placeholder-slate-500 outline-none
+                        focus:ring-2 focus:ring-indigo-600">
+          <button id="expertClear"
+                  class="hidden absolute inset-y-0 right-2 my-auto h-7 px-2 rounded-md text-xs font-semibold
+                         bg-slate-700 hover:bg-slate-600 text-slate-100">
+            {% trans "Clear" %}
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Django messages -->
+    {% if messages %}
+      <div class="space-y-2">
+        {% for message in messages %}
+          <div class="rounded-xl border p-3
+                      {% if message.tags == 'success' %}
+                        border-emerald-800/50 bg-emerald-500/10 text-emerald-300
+                      {% elif message.tags == 'error' or message.tags == 'danger' %}
+                        border-rose-800/50 bg-rose-500/10 text-rose-300
+                      {% elif message.tags == 'warning' %}
+                        border-amber-800/50 bg-amber-500/10 text-amber-300
+                      {% else %}
+                        border-slate-800 bg-slate-800/50 text-slate-200
+                      {% endif %}">
+            {{ message }}
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+
+    <!-- Experts list -->
+    <div id="expertsGrid" class="space-y-5">
+      {% for x in experts %}
+        {% with sub=active_map|get_item:x.id %}
+        <div class="expert-card rounded-2xl border border-slate-800 bg-slate-900 p-5"
+             data-name="{{ x.name|lower }}"
+             data-bio="{{ x.bio|default:''|lower }}">
+          <div class="flex flex-col sm:flex-row sm:items-start gap-5">
+
+            <!-- Avatar -->
+            <div class="shrink-0">
+              {% if x.avatar %}
+                <img src="{{ x.avatar.url }}" alt="{{ x.name }}"
+                     class="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl object-cover border border-slate-800 shadow-sm">
+              {% else %}
+                <div class="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl bg-slate-800 border border-slate-700
+                            flex items-center justify-center text-xl font-bold text-slate-300">
+                  {{ x.name|first|upper }}
+                </div>
+              {% endif %}
+            </div>
+
+            <!-- Middle: name + stats + bio -->
+            <div class="flex-1 min-w-0">
+              <div class="flex items-start justify-between gap-3">
+                <div class="min-w-0">
+                  <h2 class="expert-name text-lg sm:text-xl font-semibold truncate">{{ x.name }}</h2>
+                  {% if x.bio %}
+                    <p class="expert-bio text-slate-400 text-sm mt-1 line-clamp-2">{{ x.bio }}</p>
+                  {% endif %}
+                </div>
+
+                {% if sub %}
+                  <span class="inline-flex items-center gap-1.5 text-[11px] font-semibold tracking-wide px-3 py-1
+                               rounded-full bg-emerald-500/10 text-emerald-300 border border-emerald-700/50">
+                    <span class="inline-block h-2 w-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                    {% trans "COPYING" %}
+                  </span>
+                {% endif %}
+              </div>
+
+              <!-- Stats -->
+              <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-4">
+                <div class="rounded-xl bg-slate-950/40 border border-slate-800 p-3">
+                  <div class="text-[11px] text-slate-400">Wins</div>
+                  <div class="text-lg font-semibold">{{ x.wins }}</div>
+                </div>
+                <div class="rounded-xl bg-slate-950/40 border border-slate-800 p-3">
+                  <div class="text-[11px] text-slate-400">Losses</div>
+                  <div class="text-lg font-semibold">{{ x.losses }}</div>
+                </div>
+                <div class="rounded-xl bg-slate-950/40 border border-slate-800 p-3">
+                  <div class="text-[11px] text-slate-400">Win Rate</div>
+                  <div class="text-lg font-semibold">{{ x.win_rate }}%</div>
+                </div>
+                <div class="rounded-xl bg-slate-950/40 border border-slate-800 p-3">
+                  <div class="text-[11px] text-slate-400">Profit Share</div>
+                  <div class="text-lg font-semibold">{{ x.profit_share }}%</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Right: actions -->
+            <div class="shrink-0 w-full sm:w-auto flex sm:flex-col gap-3 justify-end">
+              {% if sub %}
+                <form method="post" action="{% url 'copy_cancel' x.id %}" class="w-full sm:w-auto">
+                  {% csrf_token %}
+                  <button class="w-full sm:w-36 px-4 py-2.5 rounded-xl
+                                 bg-rose-600 hover:bg-rose-700 text-white font-semibold shadow
+                                 border border-rose-500/40">
+                    {% trans "Cancel" %}
+                  </button>
+                </form>
+              {% else %}
+                <form method="post" action="{% url 'copy_start' x.id %}" class="w-full sm:w-auto">
+                  {% csrf_token %}
+                  <button class="w-full sm:w-36 px-4 py-2.5 rounded-xl
+                                 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold shadow
+                                 border border-emerald-500/40">
+                    {% trans "Copy" %}
+                  </button>
+                </form>
+              {% endif %}
+            </div>
+
+          </div>
+        </div>
+        {% endwith %}
+      {% empty %}
+        <div class="rounded-xl border border-slate-800 bg-slate-900 p-6 text-slate-300">
+          {% trans "No experts are available yet" %}.
+        </div>
+      {% endfor %}
+    </div>
+
+    <!-- No results (hidden by default) -->
+    <div id="noResults"
+         class="hidden rounded-xl border border-slate-800 bg-slate-900 p-6 text-slate-300 text-center">
+      {% trans " experts match your search" %}.
+    </div>
+
+  </main>
+
+  <!-- Simple client-side filtering -->
+  <script>
+    (function(){
+      const qInput = document.getElementById('expertSearch');
+      const clear  = document.getElementById('expertClear');
+      const cards  = Array.from(document.querySelectorAll('.expert-card'));
+      const noRes  = document.getElementById('noResults');
+
+      function norm(s){ return (s||'').toString().trim().toLowerCase(); }
+
+      function filter(){
+        const q = norm(qInput.value);
+        let visible = 0;
+
+        cards.forEach(card => {
+          // match against data attributes for speed, fallback to inner text
+          const name = card.getAttribute('data-name') || '';
+          const bio  = card.getAttribute('data-bio')  || '';
+          const hay  = name + ' ' + bio;
+          const show = q === '' || hay.includes(q);
+
+          card.style.display = show ? '' : 'none';
+          if (show) visible++;
+        });
+
+        // toggle clear button
+        if (clear) clear.classList.toggle('hidden', q === '');
+
+        // toggle "no results" box
+        if (noRes) noRes.classList.toggle('hidden', visible !== 0);
+      }
+
+      if (qInput) {
+        qInput.addEventListener('input', filter);
+        // Enter shouldn’t submit anything on this page
+        qInput.addEventListener('keydown', function(e){
+          if (e.key === 'Enter') e.preventDefault();
+        });
+      }
+      if (clear) {
+        clear.addEventListener('click', function(){
+          qInput.value = '';
+          filter();
+          qInput.focus();
+        });
+      }
+
+      // initial (in case of back/forward cache)
+      filter();
+    })();
+  </script>
+
+</body>
+</html>

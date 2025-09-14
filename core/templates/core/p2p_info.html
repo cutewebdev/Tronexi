@@ -1,0 +1,243 @@
+{% load static %}
+{% load i18n %}
+{% load l10n %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>P2P Trading — Info & Agreement</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <!-- Tailwind (CDN) -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    .glass { background: rgba(255,255,255,0.05); backdrop-filter: blur(8px); }
+  </style>
+</head>
+<body class="min-h-screen bg-slate-950 text-slate-100">
+
+  <!-- Header -->
+  <header class="border-b border-slate-800/70">
+    <div class="max-w-6xl mx-auto px-4 py-5 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <img src="{% static 'image/avatar.png' %}" alt="Logo" class="w-9 h-9 rounded-full border border-slate-800 object-cover">
+        <img src="{% static 'image/logo_nextwhite.png' %}" alt="Tronexi" class="h-12 sm:h-14 md:h-10 ig:h-18 w-auto object-contain" />
+      </div>
+      <a href="{% url 'dashboard' %}" class="text-sm text-slate-300 hover:text-white underline">Back to Dashboard</a>
+    </div>
+  </header>
+
+  <!-- Hero -->
+  <section class="relative">
+    <div class="absolute inset-0 bg-gradient-to-b from-emerald-600/10 via-indigo-600/5 to-transparent"></div>
+    <div class="relative max-w-6xl mx-auto px-4 py-10 md:py-14">
+      <div class="grid md:grid-cols-2 gap-8 items-center">
+        <div>
+          <div class="inline-flex items-center gap-2 text-emerald-300 text-xs font-semibold bg-emerald-400/10 px-2.5 py-1 rounded-full border border-emerald-400/20">
+            <span>{% trans "Escrow Protected" %}</span>
+            <span class="w-1 h-1 rounded-full bg-emerald-400/70"></span>
+            <span>{% trans "Verified Vendors" %}</span>
+          </div>
+          <h2 class="mt-4 text-3xl md:text-4xl font-bold leading-tight">
+            {% trans "Peer-to-Peer (P2P) Trading" %}
+          </h2>
+          <p class="mt-3 text-slate-300">
+            {% blocktrans %}Buy and sell crypto directly with other users. Your funds are secured in escrow until the trade is completed.{% endblocktrans %}
+          </p>
+          <ul class="mt-5 space-y-2 text-sm text-slate-300">
+            <li class="flex items-start gap-2">
+              <!-- check icon -->
+              <svg class="w-5 h-5 mt-0.5 text-emerald-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg>
+              {% trans "Zero platform fees for P2P trades" %}
+            </li>
+            <li class="flex items-start gap-2">
+              <svg class="w-5 h-5 mt-0.5 text-emerald-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg>
+              {% trans "24/7 support if disputes arise" %}
+            </li>
+          </ul>
+        </div>
+
+        <!-- How it works card -->
+        <div class="glass rounded-xl border border-slate-800 p-5 md:p-6 shadow-lg">
+          <h3 class="text-lg font-semibold mb-4">{% trans "How P2P Works" %}</h3>
+          <ol class="space-y-4">
+            <li class="flex gap-4">
+              <div class="flex-shrink-0 w-8 h-8 rounded-full bg-emerald-500/20 text-emerald-300 flex items-center justify-center font-bold">1</div>
+              <div>
+                <div class="font-medium">{% trans "Choose a verified vendor" %}</div>
+                <p class="text-sm text-slate-300">{% blocktrans %}Browse the list and pick a trader with strong ratings and your preferred payment method.{% endblocktrans %}</p>
+              </div>
+            </li>
+            <li class="flex gap-4">
+              <div class="flex-shrink-0 w-8 h-8 rounded-full bg-emerald-500/20 text-emerald-300 flex items-center justify-center font-bold">2</div>
+              <div>
+                <div class="font-medium">{% trans "Funds held in escrow" %}</div>
+                <p class="text-sm text-slate-300">{% blocktrans %}Tronexi locks the crypto in escrow while you complete payment to the vendor.{% endblocktrans %}</p>
+              </div>
+            </li>
+            <li class="flex gap-4">
+              <div class="flex-shrink-0 w-8 h-8 rounded-full bg-emerald-500/20 text-emerald-300 flex items-center justify-center font-bold">3</div>
+              <div>
+                <div class="font-medium">{% trans "Make payment" %}</div>
+                <p class="text-sm text-slate-300">{% blocktrans %}Pay the vendor using the agreed method and upload proof inside the chat if requested.{% endblocktrans %}</p>
+              </div>
+            </li>
+            <li class="flex gap-4">
+              <div class="flex-shrink-0 w-8 h-8 rounded-full bg-emerald-500/20 text-emerald-300 flex items-center justify-center font-bold">4</div>
+              <div>
+                <div class="font-medium">{% trans "Crypto is released" %}</div>
+                <p class="text-sm text-slate-300">{% blocktrans %}After the vendor confirms, escrow releases the crypto to you immediately.{% endblocktrans %}</p>
+              </div>
+            </li>
+          </ol>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Why & Safety -->
+  <section class="max-w-6xl mx-auto px-4 py-8 md:py-10">
+    <div class="grid md:grid-cols-2 gap-6">
+      <div class="rounded-xl border border-slate-800 bg-slate-900 p-6">
+        <h3 class="text-lg font-semibold mb-3">{% trans "Why traders choose P2P" %}</h3>
+        <div class="grid sm:grid-cols-2 gap-4 text-sm">
+          <div class="rounded-lg border border-slate-800 p-4 bg-slate-800/40">
+            <div class="font-medium mb-1">{% trans "Global payment options" %}</div>
+            <p class="text-slate-300">{% blocktrans %}Bank transfer, mobile money, cash deposit and more—depending on the vendor.{% endblocktrans %}</p>
+          </div>
+          <div class="rounded-lg border border-slate-800 p-4 bg-slate-800/40">
+            <div class="font-medium mb-1">{% trans "Competitive rates" %}</div>
+            <p class="text-slate-300">{% blocktrans %}Negotiate or pick the best available offers from verified vendors.{% endblocktrans %}</p>
+          </div>
+          <div class="rounded-lg border border-slate-800 p-4 bg-slate-800/40">
+            <div class="font-medium mb-1">{% trans "Escrow-backed" %}</div>
+            <p class="text-slate-300">{% blocktrans %}Your crypto is secured by our escrow until payment is confirmed.{% endblocktrans %}</p>
+          </div>
+          <div class="rounded-lg border border-slate-800 p-4 bg-slate-800/40">
+            <div class="font-medium mb-1">{% trans "Dispute resolution" %}</div>
+            <p class="text-slate-300">{% blocktrans %}If needed, our team assists to resolve issues fairly and quickly.{% endblocktrans %}</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="rounded-xl border border-slate-800 bg-slate-900 p-6">
+        <h3 class="text-lg font-semibold mb-3">{% trans "Safety checklist" %}</h3>
+        <ul class="space-y-2 text-sm">
+          <li class="flex gap-2">
+            <svg class="w-5 h-5 text-emerald-400 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.5 12.75l6 6 9-13.5"/></svg>
+            {% blocktrans %}Trade only with verified vendors and check their rating history.{% endblocktrans %}
+          </li>
+          <li class="flex gap-2">
+            <svg class="w-5 h-5 text-emerald-400 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.5 12.75l6 6 9-13.5"/></svg>
+            {% blocktrans %}Always keep conversation and proof inside Tronexi chat.{% endblocktrans %}
+          </li>
+          <li class="flex gap-2">
+            <svg class="w-5 h-5 text-emerald-400 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.5 12.75l6 6 9-13.5"/></svg>
+            {% blocktrans %}Release or accept release only after confirming payment.{% endblocktrans %}
+          </li>
+          <li class="flex gap-2">
+            <svg class="w-5 h-5 text-emerald-400 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.5 12.75l6 6 9-13.5"/></svg>
+            {% blocktrans %}Open a dispute if something feels off—support is available 24/7.{% endblocktrans %}
+          </li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- Agreement + CTA -->
+  <section class="max-w-3xl mx-auto px-4 pb-10">
+    <div class="rounded-xl border border-slate-800 bg-slate-900 p-6">
+      <h3 class="text-lg font-semibold">{% trans "Agreement" %}</h3>
+      <p class="mt-2 text-sm text-slate-300">
+        {% blocktrans %}By proceeding, you acknowledge that you understand how P2P works, and you agree to follow the safety guidelines
+        and provide truthful payment confirmations. Violations may result in account restrictions.{% endblocktrans %}
+      </p>
+
+      <div class="mt-4 flex items-center gap-2">
+        <input id="agreeP2P" type="checkbox" class="h-4 w-4 rounded border-slate-600 bg-slate-800">
+        <label for="agreeP2P" class="text-sm text-slate-300">{% blocktrans %}I agree to use P2P under the terms above.{% endblocktrans %}</label>
+      </div>
+
+      <div class="mt-5 flex flex-wrap gap-3">
+        <a id="proceedBtn"
+           href="{% url 'vendor_list' %}"
+           class="pointer-events-none opacity-50 inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-semibold transition">
+          {% trans "View Verified Vendors" %}
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>
+        </a>
+        <a href="#faq" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-slate-700 hover:bg-slate-800 text-slate-200 transition">
+          Read FAQ
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section id="faq" class="max-w-6xl mx-auto px-4 pb-16">
+    <h3 class="text-lg font-semibold mb-4">{% trans "Frequently Asked Questions" %}</h3>
+    <div class="grid md:grid-cols-2 gap-6">
+      <div class="rounded-xl border border-slate-800 bg-slate-900 p-5">
+        <div class="font-medium">{% trans "What is escrow?" %}</div>
+        <p class="mt-1 text-sm text-slate-300">
+          {% blocktrans %}Escrow temporarily holds the seller’s crypto. It is released only after the seller confirms they’ve received your payment.{% endblocktrans %}
+        </p>
+      </div>
+      <div class="rounded-xl border border-slate-800 bg-slate-900 p-5">
+        <div class="font-medium">{% trans "How long do trades take?" %}</div>
+        <p class="mt-1 text-sm text-slate-300">
+          {% blocktrans %}Most trades complete within minutes once payment is sent. If there’s a delay, you can open a dispute.{% endblocktrans %}
+        </p>
+      </div>
+      <div class="rounded-xl border border-slate-800 bg-slate-900 p-5">
+        <div class="font-medium">{% trans "What if I’m asked to chat off-platform?" %}</div>
+        <p class="mt-1 text-sm text-slate-300">
+          {% blocktrans %}Keep all communications and uploads inside Tronexi. This keeps you protected and allows support to help.{% endblocktrans %}
+        </p>
+      </div>
+      <div class="rounded-xl border border-slate-800 bg-slate-900 p-5">
+        <div class="font-medium">{% trans "Is my account protected?" %}</div>
+        <p class="mt-1 text-sm text-slate-300">
+          {% blocktrans %}Yes, follow the safety checklist and only confirm actions you’ve verified. Our team monitors for fraud signals.{% endblocktrans %}
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <footer class="border-t border-slate-800/70">
+    <div class="max-w-6xl mx-auto px-4 py-6 text-center text-xs text-slate-400">
+      &copy; {{ now.year|default:2025 }} Tronexi — P2P Trading. All rights reserved.
+    </div>
+  </footer>
+
+  <!-- Enable CTA only when agreed -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function(){
+      var agree = document.getElementById('agreeP2P');
+      var btn   = document.getElementById('proceedBtn');
+      if (!agree || !btn) return;
+
+      function sync(){
+        if (agree.checked) {
+          btn.classList.remove('opacity-50','pointer-events-none');
+        } else {
+          btn.classList.add('opacity-50','pointer-events-none');
+        }
+      }
+      agree.addEventListener('change', sync);
+      sync();
+    });
+  </script>
+
+  <!-- Tawk.to -->
+  <script type="text/javascript">
+  var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date();
+  (function(){
+    var s1=document.createElement("script"),s0=document.getElementsByTagName("script")[0];
+    s1.async=true;
+    s1.src='https://embed.tawk.to/688a2b5d4870571920646522/1j1dripnt';
+    s1.charset='UTF-8';
+    s1.setAttribute('crossorigin','*');
+    s0.parentNode.insertBefore(s1,s0);
+  })();
+  </script>
+</body>
+</html>

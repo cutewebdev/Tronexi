@@ -1,0 +1,243 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-08-05 11:44+0100\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: .\core\templates\core\home.html:42
+msgid "Welcome to Tronexi"
+msgstr "Bula vinaka ki Tronexi"
+
+#: .\core\templates\core\home.html:109
+msgid "of Decentralized Trading"
+msgstr "ni veisau vakailawalawa"
+
+#: .\core\templates\core\home.html:111
+msgid "Join Tronexi – secure, fast, with access to global P2P traders."
+msgstr "Curuma na Tronexi – taqomaki, totolo, ena rawarawa vei ira na dauvolitaki P2P e vuravura raraba."
+
+#: .\core\templates\core\home.html:112
+msgid "Get Started"
+msgstr "Tekivu oqo"
+
+#: .\core\templates\core\home.html:118
+msgid "What Our Users Say"
+msgstr "Na ka era tukuna na noda dauvakayagataka"
+
+#: .\core\templates\core\home.html:121
+msgid "Tronexi changed the way I trade. It's fast, secure, and so easy to use."
+msgstr "Sa veisautaka na Tronexi na noqu ivakarau ni veisau. E totolo, taqomaki, ka rawarawa sara ni vakayagataka."
+
+#: .\core\templates\core\home.html:122
+msgid "– Elsie A."
+msgstr "– Elsie A."
+
+#: .\core\templates\core\home.html:125
+msgid "The escrow system and fast support gave me peace of mind."
+msgstr "Na ivakarau ni escrow kei na veitokoni totolo e solia vei au na vakacegu ni vakasama."
+
+#: .\core\templates\core\home.html:126
+msgid "– Arnfried K."
+msgstr "– Arnfried K."
+
+#: .\core\templates\core\home.html:129
+msgid "Best P2P platform I've ever used. Smooth experience!"
+msgstr "Na misini vinaka duadua ni P2P au sa vakayagataka. Rawarawa ka totoka na vakasama!"
+
+#: .\core\templates\core\home.html:130
+msgid "– Emily L."
+msgstr "– Emily L."
+
+#: .\core\templates\core\home.html:153
+msgid "100K+"
+msgstr "100K+"
+
+#: .\core\templates\core\home.html:154
+msgid "Active Users"
+msgstr "Dauvakayagataka bula"
+
+#: .\core\templates\core\home.html:157
+msgid "$250M+"
+msgstr "$250M+"
+
+#: .\core\templates\core\home.html:158
+msgid "Volume Traded"
+msgstr "iSau ni veisau"
+
+#: .\core\templates\core\home.html:161
+#, python-format
+msgid "99.99%%"
+msgstr "99.99%%"
+
+#: .\core\templates\core\home.html:162
+msgid "Uptime"
+msgstr "Tiko tudei"
+
+#: .\core\templates\core\home.html:165
+msgid "140+"
+msgstr "140+"
+
+#: .\core\templates\core\home.html:166
+msgid "Supported Countries"
+msgstr "Veivanua e tokoni"
+
+#: .\core\templates\core\home.html:173
+msgid "Explore Our Core Features"
+msgstr "Raica na noda veika bibi"
+
+#: .\core\templates\core\home.html:177
+msgid "Secure Trading"
+msgstr "Veisau taqomaki"
+
+#: .\core\templates\core\home.html:178
+msgid "P2P Escrow"
+msgstr "Escrow P2P"
+
+#: .\core\templates\core\home.html:179
+msgid "Vendor System"
+msgstr "iVakadewa ni Dauvolitaki"
+
+#: .\core\templates\core\home.html:180
+msgid "Copy Trading"
+msgstr "Veisau vakataki koya"
+
+#: .\core\templates\core\home.html:186
+msgid ""
+"Tronexi provides end-to-end encrypted trading to ensure your data and "
+"transactions remain secure, private, and tamper-proof."
+msgstr ""
+"Na Tronexi e vakarautaka na veisau vakataqomaki me rawa ni taqomaki vinaka na nomu "
+"matanitu ni idata, na veika sa caka, ka me sega ni rawa ni vakalolomataki."
+
+#: .\core\templates\core\home.html:189
+msgid ""
+"Our peer-to-peer escrow system ensures funds are safely held until both "
+"parties complete their side of the trade."
+msgstr ""
+"Na neitou ivakarau ni escrow peer-to-peer e raica me maroroi vakavinaka na lavo me yacova "
+"ni oti vinaka na veisau ena veiwasewase ruarua."
+
+#: .\core\templates\core\home.html:192
+msgid ""
+"Become a verified vendor and sell to thousands of users directly on the "
+"Tronexi platform with zero hidden fees."
+msgstr ""
+"Mo dua na dauvolitaki e vakadeitaki ka volitaka vakadodonu vei ira na udolu na "
+"dauvakayagataka ena Tronexi ka sega ni dua na isau vuni."
+
+#: .\core\templates\core\home.html:195
+msgid ""
+"Copy top traders' strategies automatically. Set commissions and grow "
+"passively while others follow your trades."
+msgstr ""
+"Kopia vakatotolo na veivakarautaki ni dauveisau rogo. Biuta na isau ni veiqaravi "
+"ka toso ena vakacegu ni ra muria na nomu veisau eso tale."
+
+#: .\core\templates\core\home.html:203
+msgid "Crypto Converter"
+msgstr "iVakarautaki ni Crypto"
+
+#: .\core\templates\core\home.html:238
+msgid "Live data via CoinGecko API"
+msgstr "iTukutuku bula mai CoinGecko API"
+
+#: .\core\templates\core\home.html:244
+msgid "Users in 140+ Countries and Regions"
+msgstr "Dauvakayagataka ena 140+ Veivanua kei na Yasana"
+
+#: .\core\templates\core\home.html:254
+msgid "How It Works"
+msgstr "Na kena iwalewale"
+
+#: .\core\templates\core\home.html:258
+msgid "Sign Up"
+msgstr "Vola Iko"
+
+#: .\core\templates\core\home.html:259
+msgid "Create your Tronexi account in just a few steps."
+msgstr "Cakava na nomu akaude ni Tronexi ena vica ga na la’ki."
+
+#: .\core\templates\core\home.html:263
+msgid "Fund your trading account"
+msgstr "Vakani na nomu akaude ni veisau"
+
+#: .\core\templates\core\home.html:264
+msgid ""
+"Fund your account by making payment to the stated wallet address attached to "
+"your account."
+msgstr ""
+"Vakacuruma na lavo ena nomu akaude ena nomu sauma yani ki na wallet e vakaraitaki."
+
+#: .\core\templates\core\home.html:268
+msgid "Trade Securely"
+msgstr "Veisau Vakataqomaki"
+
+#: .\core\templates\core\home.html:269
+msgid "Use our escrow system to complete your trade safely."
+msgstr "Vakayagataka na neitou escrow me rawa ni vakacavari vinaka na nomu veisau."
+
+#: .\core\templates\core\home.html:286
+msgid "Why Tronexi?"
+msgstr "Na Cava na vuna me Tronexi?"
+
+#: .\core\templates\core\home.html:301
+msgid "Download the Tronexi App"
+msgstr "Laiva sobu na App ni Tronexi"
+
+#: .\core\templates\core\home.html:302
+msgid "Trade anytime, anywhere. Get the app directly from our website."
+msgstr "Veisau ena gauna cava ga, ena vanua cava ga. Laiva sobu vakadodonu mai na neitou website."
+
+#: .\core\templates\core\home.html:314
+msgid "Our Partners"
+msgstr "Neitou Iwasewase"
+
+#: .\core\templates\core\home.html:358
+msgid "Quick Links"
+msgstr "iSoqo Totolo"
+
+#: .\core\templates\core\home.html:360
+msgid "Features"
+msgstr "Veika e rawa"
+
+#: .\core\templates\core\home.html:361
+msgid "Testimonials"
+msgstr "iTukutuku ni Kila"
+
+#: .\core\templates\core\home.html:362
+msgid "Partners"
+msgstr "Iwasewase"
+
+#: .\core\templates\core\home.html:363
+msgid "Download App"
+msgstr "Laiva sobu na App"
+
+#: .\core\templates\core\home.html:369
+msgid "Contact Us"
+msgstr "Veitaratara kei keitou"
+
+#: .\core\templates\core\home.html:372
+msgid "UK Headquarters"
+msgstr "iTikotiko Levu mai UK"
+
+#: .\core\templates\core\home.html:376
+msgid "Stay Updated"
+msgstr "Tiko tiko ena iTukutuku Vou"
+
+#: .\core\templates\core\home.html:379
+msgid "Subscribe"
+msgstr "Vakacuruma na Yaca"
+

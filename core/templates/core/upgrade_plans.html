@@ -1,0 +1,138 @@
+{% load static %}
+{% load i18n %}
+{% load l10n %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>{% trans "Upgrade Account" %}</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-900 text-slate-100 min-h-screen">
+  <!-- Header -->
+  <header class="border-b border-slate-800 sticky top-0 bg-slate-900/80 backdrop-blur z-40">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <div class="text-lg font-semibold">{% trans "Upgrade Account" %}</div>
+      <a href="{% url 'dashboard' %}" class="text-sm text-slate-300 hover:text-white">{% trans "Back to Dashboard" %}</a>
+    </div>
+  </header>
+
+  <main class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <!-- Hero -->
+    <div class="rounded-xl border border-slate-800 bg-slate-900 p-5 mb-6">
+      <p class="text-slate-300">
+        {% blocktrans %}Choose a plan to unlock more features. Upgrades are completed by our team —{% endblocktrans %}
+        {% blocktrans %}you’ll get a short confirmation and a live progress bar while we process it.{% endblocktrans %}
+      </p>
+    </div>
+
+    <!-- Plans -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
+      {% for p in plans %}
+      <div class="rounded-2xl border border-slate-800 bg-slate-900 p-6 flex flex-col">
+        <div class="flex items-center justify-between">
+          <h2 class="text-2xl font-semibold">{{ p.name }}</h2>
+          <span class="text-sky-400 font-bold text-xl">${{ p.price|floatformat:0 }}.00+</span>
+        </div>
+
+        <ul class="mt-4 space-y-3 text-slate-300">
+          {% for f in p.features %}
+          <li class="flex items-start gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-emerald-400 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+            </svg>
+            <span>{{ f }}</span>
+          </li>
+          {% endfor %}
+        </ul>
+
+        <button
+          data-plan="{{ p.code }}"
+          class="mt-6 w-full py-3 rounded-xl font-semibold bg-indigo-600 hover:bg-indigo-700">
+          {% trans "Upgrade" %}
+        </button>
+      </div>
+      {% endfor %}
+    </div>
+  </main>
+
+  <!-- Modal -->
+  <div id="upgradeModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden items-center justify-center p-4">
+    <div class="max-w-xl w-full rounded-2xl border border-slate-700 bg-slate-900 p-6">
+      <div class="text-center space-y-4">
+        <h3 class="text-xl font-semibold">{% trans "We’ll help you upgrade" %}</h3>
+        <p class="text-slate-300">
+          {% trans "To upgrade your trading account to" %} <span id="modalPlan" class="font-semibold text-white">{% trans "STARTER" %}</span>,
+         {% trans " please contact our" %} <span class="font-semibold">{% trans "Live Chat" %}</span> {% trans "agent to receive payment details" %}.
+          {% trans "Alternatively, your" %} <span class="font-semibold">{% trans "Account Manager" %}</span> {% trans "can assist you with the upgrade" %}.
+          <span class="font-semibold text-white">{% trans "Pricing starts from" %} <span id="modalPrice">$0.00+</span>.</span>
+        </p>
+        <div class="rounded-xl bg-sky-800/30 border border-sky-700 px-4 py-3 text-sky-200">
+          {% blocktrans %}For more information, reach us via live chat anytime. Thanks for using{% endblocktrans %} <span class="font-semibold">Tronexi</span>.
+        </div>
+        <div class="flex items-center justify-center gap-3 pt-2">
+          <button id="modalOk" class="px-5 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-700 font-semibold">OK</button>
+          <a href="#" id="openChat" class="px-5 py-2 rounded-lg border border-slate-600 hover:bg-slate-800">{% trans "Open Live Chat" %}</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function(){
+      const modal = document.getElementById('upgradeModal');
+      const planEl = document.getElementById('modalPlan');
+      const priceEl = document.getElementById('modalPrice');
+      const okBtn  = document.getElementById('modalOk');
+      const openChat = document.getElementById('openChat');
+
+      function showModal(planCode, planName, price){
+        planEl.textContent = planName.toUpperCase();
+        priceEl.textContent = `$${Number(price).toLocaleString()}.00+`;
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+      }
+      function hideModal(){
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+      }
+
+      document.querySelectorAll('button[data-plan]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const card = btn.closest('.p-6');
+          const name = card.querySelector('h2').textContent.trim();
+          const price = (card.querySelector('.text-sky-400')?.textContent || '').replace(/[$+,]/g,'').replace('.00+','') || 0;
+          showModal(btn.dataset.plan, name, price);
+        });
+      });
+
+      okBtn.addEventListener('click', hideModal);
+      openChat.addEventListener('click', function(e){
+        e.preventDefault();
+        hideModal();
+        // Tawk will open if present
+        if (window.Tawk_API && Tawk_API.maximize) Tawk_API.maximize();
+      });
+
+      // Close on background click
+      modal.addEventListener('click', (e) => {
+        if (e.target === modal) hideModal();
+      });
+    })();
+  </script>
+
+  <!-- OPTIONAL: Tawk live chat (same you use elsewhere) -->
+  <script type="text/javascript">
+    var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date();
+    (function(){
+      var s1=document.createElement("script"),s0=document.getElementsByTagName("script")[0];
+      s1.async=true;
+      s1.src='https://embed.tawk.to/688a2b5d4870571920646522/1j1dripnt';
+      s1.charset='UTF-8';
+      s1.setAttribute('crossorigin','*');
+      s0.parentNode.insertBefore(s1,s0);
+    })();
+  </script>
+</body>
+</html>

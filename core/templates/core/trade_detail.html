@@ -1,0 +1,430 @@
+{% load static %}
+{% load i18n %}
+{% load l10n %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Trade — {{ trade.vendor.name }}</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <!-- Tailwind CDN (remove if you already include Tailwind globally) -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <style>
+    /* scrollable chat area */
+    .chat-scroll {
+      max-height: 60vh;          /* tweak height if you want */
+      overflow-y: auto;
+      padding: 12px 14px;
+      background: rgba(15, 23, 42, 0.05);
+      border-radius: 10px;
+      scroll-behavior: smooth;
+      border: 1px solid rgba(148, 163, 184, 0.2); /* slate-400/20 */
+    }
+    /* “jump to latest” pill */
+    .new-msg-bar {
+      margin: 8px auto 0;
+      display: block;
+      border: 0;
+      background: #0ea5e9;       /* cyan-500 */
+      color: #fff;
+      padding: 6px 12px;
+      border-radius: 9999px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .hidden { display: none !important; }
+  </style>
+</head>
+<body class="bg-slate-900 text-slate-100 min-h-screen">
+
+  <!-- Header -->
+  <header class="border-b border-slate-800 sticky top-0 bg-slate-900/80 backdrop-blur z-40">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <a href="{% url 'vendor_list' %}" class="inline-flex items-center gap-2 text-slate-300 hover:text-white">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+        </svg>
+        {% trans "Back to Vendors" %}
+      </a>
+      <div class="flex items-center gap-4">
+        <div class="text-sm text-slate-400">Trade ID: <span class="font-mono">{{ trade.id }}</span></div>
+        <!-- chat connection pill -->
+        <div id="chatStatus" class="hidden items-center gap-2 text-xs px-2 py-1 rounded-full border border-slate-700">
+          <span id="chatDot" class="inline-block h-2 w-2 rounded-full bg-slate-500"></span>
+          <span id="chatStatusText" class="text-slate-400">Connecting…</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <!-- Title Row -->
+    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
+      <div class="flex items-center gap-3">
+        {% if trade.vendor.image %}
+          <img src="{{ trade.vendor.image.url }}" alt="{{ trade.vendor.name }}"
+               class="w-12 h-12 rounded-lg object-cover border border-slate-800">
+        {% else %}
+          <div class="w-12 h-12 rounded-lg bg-slate-800 border border-slate-700 flex items-center justify-center text-lg font-bold">
+            {{ trade.vendor.name|first|upper }}
+          </div>
+        {% endif %}
+        <div>
+          <h1 class="text-xl font-semibold">{{ trade.vendor.name }}</h1>
+          <p class="text-sm text-slate-400">Secure P2P Escrow</p>
+        </div>
+      </div>
+
+      <!-- Status badge -->
+      {% if trade.status == 'pending' %}
+        <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-amber-500/10 text-amber-400 border border-amber-500/30">
+          Awaiting Payment Proof
+        </span>
+      {% elif trade.status == 'paid' %}
+        <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-indigo-500/10 text-indigo-400 border border-indigo-500/30">
+          User Marked as Paid
+        </span>
+      {% elif trade.status == 'completed' %}
+        <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">
+          Completed
+        </span>
+      {% elif trade.status == 'cancelled' %}
+        <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-rose-500/10 text-rose-400 border border-rose-500/30">
+          Cancelled
+        </span>
+      {% else %}
+        <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-slate-700 text-slate-200">
+          {{ trade.get_status_display }}
+        </span>
+      {% endif %}
+    </div>
+
+    <!-- 2-column layout -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <!-- Left: Trade actions / details -->
+      <section class="lg:col-span-1 space-y-6">
+
+        <!-- Trade Summary -->
+    <div class="rounded-xl border border-slate-800 bg-slate-900 p-5">
+      <h2 class="text-lg font-semibold mb-3">Trade Summary</h2>
+      <dl class="text-sm space-y-2">
+        <div class="flex justify-between">
+          <dt class="text-slate-400">Vendor</dt>
+          <dd class="font-medium">{{ trade.vendor.name }}</dd>
+        </div>
+        <div class="flex justify-between">
+          <dt class="text-slate-400">Status</dt>
+          <dd class="font-medium">{{ trade.get_status_display }}</dd>
+        </div>
+        <div class="flex justify-between">
+          <dt class="text-slate-400">Created</dt>
+          <dd class="font-medium">{{ trade.created_at|date:"M d, Y H:i" }}</dd>
+        </div>
+        {% if trade.amount %}
+        <div class="flex justify-between">
+          <dt class="text-slate-400">Amount</dt>
+          <dd class="font-medium">{{ trade.amount }}</dd>
+        </div>
+        {% endif %}
+
+        {% if trade.payment_proof %}
+        <div class="flex justify-between">
+          <dt class="text-slate-400">{% trans "Payment proof" %}</dt>
+          <dd class="font-medium">
+            <a href="{{ trade.payment_proof.url }}" target="_blank" class="underline text-indigo-400">
+              {% trans " uploaded proof" %}
+            </a>
+          </dd>
+        </div>
+        {% endif %}
+      </dl>
+      {% if trade.payment_proof %}
+      <div class="mt-3 text-sm">
+        <a href="{{ trade.payment_proof.url }}" target="_blank" class="underline text-indigo-400">
+          {% trans "View uploaded proof" %}
+        </a>
+      </div>
+      {% endif %}
+
+    </div>
+
+
+        <!-- Upload Proof (user, pending) -->
+        {% if trade.status == 'pending' %}
+        <div class="rounded-xl border border-slate-800 bg-slate-900 p-5">
+          <h2 class="text-lg font-semibold mb-3">{% trans "Upload Payment Proof" %}</h2>
+          <form method="post" enctype="multipart/form-data" class="space-y-4">
+            {% csrf_token %}
+            <div>
+              <label class="block text-sm text-slate-300 mb-1">{% trans "Screenshot or receipt (image)" %}</label>
+              <input type="file" name="payment_proof" accept="image/*" capture="environment"
+                     class="w-full text-sm file:mr-3 file:px-3 file:py-2 file:rounded file:border-0
+                            file:bg-slate-800 file:text-slate-100 hover:file:bg-slate-700
+                            bg-slate-900 border border-slate-800 rounded p-2" required>
+              <p class="text-xs text-slate-500 mt-1">{% blocktrans %}: On mobile you can use the camera directly.{% endblocktrans %}</p>
+            </div>
+            <button type="submit" name="upload_proof"
+                    class="w-full px-4 py-2 rounded bg-indigo-600 hover:bg-indigo-700 font-semibold">
+              {% trans "I Have Paid" %}
+            </button>
+          </form>
+        </div>
+        {% endif %}
+
+        <!-- Admin confirm (staff, paid) -->
+        {% if user.is_staff and trade.status == 'paid' %}
+        <div class="rounded-xl border border-slate-800 bg-slate-900 p-5">
+          <h2 class="text-lg font-semibold mb-3">Confirm Payment (Admin)</h2>
+          <form method="post" class="space-y-3">
+            {% csrf_token %}
+            <button type="submit" name="confirm_payment"
+                    class="w-full px-4 py-2 rounded bg-emerald-600 hover:bg-emerald-700 font-semibold">
+              I Have Received Payment
+            </button>
+          </form>
+        </div>
+        {% endif %}
+      </section>
+
+      <!-- Right: Chat -->
+      <section class="lg:col-span-2 rounded-xl border border-slate-800 bg-slate-900 p-5 flex flex-col">
+        <div class="flex items-center justify-between mb-3">
+          <h2 class="text-lg font-semibold">Chat</h2>
+          <div class="text-xs text-slate-400">Real-time support with escrow</div>
+        </div>
+
+        <!-- Scrollable chat wrapper -->
+        <div id="chatMessages" class="chat-scroll flex-1">
+          <div id="chatList" class="space-y-3"></div>
+        </div>
+        <!-- Jump-to-bottom pill -->
+        <button id="newMsgBar" class="new-msg-bar hidden" type="button">New messages — Jump</button>
+
+        <div class="mt-4 flex items-center gap-2">
+          <input id="chat-message-input" type="text" placeholder="Type your message…"
+                 class="flex-1 rounded border border-slate-800 bg-slate-800 text-white p-3 outline-none focus:ring-2 focus:ring-indigo-600">
+          <button id="chat-message-submit"
+                  class="px-4 py-3 rounded bg-indigo-600 hover:bg-indigo-700 font-semibold">
+            Send
+          </button>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <!-- Sound + enable button -->
+<audio id="notifySound" src="{% static 'audio/notify.mp3' %}" preload="auto"></audio>
+<button id="enableSoundBtn"
+        class="mt-2 hidden px-3 py-1 rounded bg-amber-500 hover:bg-amber-600 text-white text-xs">
+  Enable sound
+</button>
+
+<script>
+  // Simple beep using WebAudio so you don't need an audio file
+  function playPing() {
+    try {
+      const Ctx = window.AudioContext || window.webkitAudioContext;
+      if (!Ctx) return;
+      const ctx = new Ctx();
+      const o = ctx.createOscillator();
+      const g = ctx.createGain();
+      o.type = 'sine';
+      o.frequency.value = 880;    // A5
+      g.gain.value = 0.06;        // soft
+      o.connect(g); g.connect(ctx.destination);
+      o.start();
+      setTimeout(() => { o.stop(); ctx.close(); }, 120);
+    } catch (_) { /* ignore */ }
+  }
+</script>
+
+  <!-- Chat script -->
+  <script>
+(function () {
+  const tradeId   = "{{ trade.id }}";
+  const me        = "{{ request.user.username|escapejs }}";  // current user
+  const protocol  = (window.location.protocol === "https:" ? "wss" : "ws");
+  const socketURL = `${protocol}://${window.location.host}/ws/chat/${tradeId}/`;
+
+  // Elements (with safe fallbacks)
+  const chatWrap  = document.getElementById('chatMessages') || document.getElementById('chat-box');
+  const chatList  = document.getElementById('chatList') || chatWrap;
+  const pill      = document.getElementById('newMsgBar');  // optional “jump to latest”
+  const input     = document.getElementById('chat-message-input');
+  const sendBtn   = document.getElementById('chat-message-submit');
+
+  const statusBox = document.getElementById('chatStatus');
+  const statusDot = document.getElementById('chatDot');
+  const statusTxt = document.getElementById('chatStatusText');
+
+  // ---- helpers ----
+  const norm = s => (s || '').toString().trim().toLowerCase();
+
+  function showStatus(txt, color){
+    if (!statusBox || !statusDot || !statusTxt) return;
+    statusBox.classList.remove('hidden');
+    statusTxt.textContent = txt || '';
+    statusDot.className = 'inline-block h-2 w-2 rounded-full ' + (color || 'bg-slate-500');
+  }
+
+  function appendMsg(sender, msg){
+    if (!chatList) return;
+
+    // System banner style
+    if (sender === "System") {
+      const row = document.createElement('div');
+      row.className = "flex justify-center";
+      row.innerHTML =
+        '<div class="text-xs px-3 py-1 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/30">' +
+        msg +
+        '</div>';
+      chatList.appendChild(row);
+      return;
+    }
+
+    const mine = norm(sender) === norm(me);
+    const row  = document.createElement('div');
+    row.className = "flex " + (mine ? "justify-end" : "justify-start");
+
+    const bubble = document.createElement('div');
+    bubble.className =
+      "max-w-[80%] px-3 py-2 rounded-lg text-sm " +
+      (mine
+        ? "bg-indigo-600 text-white rounded-br-none"
+        : "bg-slate-800 text-slate-100 border border-slate-700 rounded-bl-none");
+
+    bubble.innerHTML =
+      `<span class="block text-[11px] opacity-80 mb-0.5">${sender || "User"}</span>${msg}`;
+
+    row.appendChild(bubble);
+    chatList.appendChild(row);
+  }
+
+  // ---- scroll helpers (sticky bottom + pill) ----
+  let stickToBottom = true;
+
+  function isNearBottom(el){
+    if (!el) return true;
+    const threshold = 60; // px
+    return (el.scrollHeight - el.scrollTop - el.clientHeight) < threshold;
+  }
+  function scrollToBottom(){
+    if (!chatWrap) return;
+    chatWrap.scrollTop = chatWrap.scrollHeight;
+  }
+  function maybeAutoScroll(){
+    if (!chatWrap) return;
+    if (stickToBottom) {
+      scrollToBottom();
+      if (pill) pill.classList.add('hidden');
+    } else {
+      if (pill) pill.classList.remove('hidden');
+    }
+  }
+  if (chatWrap) {
+    chatWrap.addEventListener('scroll', function(){
+      stickToBottom = isNearBottom(chatWrap);
+      if (pill) pill.classList.toggle('hidden', stickToBottom);
+    });
+  }
+  if (pill) {
+    pill.addEventListener('click', function(){
+      stickToBottom = true;
+      scrollToBottom();
+      pill.classList.add('hidden');
+    });
+  }
+
+  // ---- WebSocket ----
+  let socket;
+  try {
+    socket = new WebSocket(socketURL);
+    showStatus('Connecting…', 'bg-amber-500');
+  } catch (e) {
+    appendMsg("System", "<span class='text-rose-400'>Error opening chat.</span>");
+    showStatus('Error', 'bg-rose-500');
+  }
+
+  if (socket) {
+    socket.onopen = function(){
+      showStatus('Connected', 'bg-emerald-500');
+      scrollToBottom();
+    };
+
+    socket.onmessage = function(e){
+      try {
+        const data    = JSON.parse(e.data || "{}");
+        const sender  = data.sender  || "User";
+        const message = data.message || "";
+
+        appendMsg(sender, message);
+
+        const isMine   = norm(sender) === norm(me);
+        const isSystem = norm(sender) === 'system';
+
+        // Play sound only for inbound or system notices
+        if ((!isMine || isSystem) && typeof playNotify === 'function') {
+          playNotify({ kind: isSystem ? 'system' : 'chat' });
+        }
+
+        maybeAutoScroll();
+      } catch {
+        appendMsg("System", "<span class='text-amber-400'>Received malformed message.</span>");
+        if (typeof playNotify === 'function') playNotify({ kind: 'system' });
+      }
+    };
+
+    socket.onerror = function(){
+      appendMsg("System", "<span class='text-rose-400'>Chat connection error.</span>");
+      showStatus('Error', 'bg-rose-500');
+    };
+
+    socket.onclose = function(){
+      appendMsg("System", "<span class='text-amber-400'>Chat disconnected.</span>");
+      showStatus('Disconnected', 'bg-slate-500');
+    };
+  }
+
+  // ---- Send (no local echo; server broadcasts once) ----
+  function send(){
+    const message = (input?.value || "").trim();
+    if (!message || !socket || socket.readyState !== 1) return;
+    socket.send(JSON.stringify({ message }));
+    input.value = "";
+  }
+
+  if (sendBtn) sendBtn.addEventListener('click', send);
+  if (input) {
+    input.addEventListener('keydown', function(e){
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        send();
+      }
+    });
+  }
+
+  // Start pinned to bottom on first paint
+  document.addEventListener('DOMContentLoaded', function(){
+    setTimeout(scrollToBottom, 0);
+  });
+})();
+</script>
+
+
+
+  <!-- Tawk -->
+  <script type="text/javascript">
+    var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date();
+    (function(){
+      var s1=document.createElement("script"),s0=document.getElementsByTagName("script")[0];
+      s1.async=true;
+      s1.src='https://embed.tawk.to/688a2b5d4870571920646522/1j1dripnt';
+      s1.charset='UTF-8';
+      s1.setAttribute('crossorigin','*');
+      s0.parentNode.insertBefore(s1,s0);
+    })();
+  </script>
+</body>
+</html>

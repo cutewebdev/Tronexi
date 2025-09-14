@@ -1,0 +1,21 @@
+{% extends "email/base_email.html" %}
+{% block body %}
+<tr>
+  <td style="padding:24px;">
+    <h1 style="margin:0 0 12px;font-size:20px;color:#e2e8f0;">Upgrade Declined</h1>
+    <p style="margin:0 0 12px;line-height:1.6;color:#cbd5e1;">
+      Hi {{ username }}, we couldn’t complete your upgrade request to
+      <strong>{{ plan_label }}</strong>.
+    </p>
+    {% if reason %}
+    <p style="margin:0 0 12px;line-height:1.6;color:#cbd5e1;">
+      <strong>Reason:</strong> {{ reason }}
+    </p>
+    {% endif %}
+    <p style="margin:0;line-height:1.6;color:#cbd5e1;">
+      You can contact our Live Chat for assistance or try again later.
+    </p>
+    <p style="margin:12px 0 0;"><a href="{{ site_url }}" style="color:#60a5fa;text-decoration:none;">Go to dashboard →</a></p>
+  </td>
+</tr>
+{% endblock %}

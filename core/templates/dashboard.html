@@ -1,0 +1,2088 @@
+{% load static %}
+{% load i18n %}
+{% load l10n %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Dashboard — Tronexi</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/feather-icons"></script>
+  <style>
+    .sidebar-scroll { max-height: calc(100vh - 100px); overflow-y: auto; }
+    .glass { background: rgba(255,255,255,0.04); }
+    .card { background: white; color: #0f172a; border-radius: 12px; }
+    .currency-badge { font-weight: 700; }
+    @media (max-width: 768px) { #desktopSidebar { display: none; } }
+    @media (min-width: 769px) { #mobileMenuBtn { display: none; } }
+  </style>
+</head>
+<body class="bg-slate-900 text-slate-100 min-h-screen">
+
+<!-- Server numbers for scripts -->
+<div id="server-vars"
+     data-account-balance="{{ account_balance|unlocalize|floatformat:2|default:'0' }}"
+     data-profit-today="{{ profit_today|unlocalize|floatformat:2|default:'0' }}"
+     data-bonus-amount="{{ bonus_amount|unlocalize|floatformat:2|default:'0' }}"
+     data-currency-symbol="{{ currency_symbol|default:'£' }}"
+     hidden></div>
+
+
+<!-- Top nav -->
+<header class="fixed top-0 left-0 right-0 z-40 bg-slate-900/80 backdrop-blur-sm border-b border-slate-800">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex items-center justify-between h-16">
+      <div class="flex items-center space-x-4">
+        <!-- Mobile hamburger -->
+        <button id="mobileMenuBtn" class="p-2 rounded-md hover:bg-slate-800" aria-label="Open menu">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-slate-100" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+        </button>
+
+        <!-- Logo -->
+        <a href="/" class="flex items-center gap-3">
+          <img src="{% static 'image/avatar.png' %}" alt="User Avatar" class="h-9 w-9 rounded-full object-cover border border-slate-700">
+          <img src="{% static 'image/logo_nextwhite.png' %}" alt="Tronexi" class="h-12 sm:h-14 md:h-10 ig:h-18 w-auto object-contain" />
+        </a>
+      </div>
+
+      <div class="flex items-center gap-4">
+        <!-- Copy Trading & Add Funds & Link Wallet -->
+        <div class="hidden md:flex items-center gap-3">
+          <a href="{% url 'copy_list' %}" class="flex items-center gap-3 px-3 py-2 rounded hover:bg-slate-800">
+          <i data-feather="users" class="w-5 h-5 text-slate-300"></i>{% trans "Copy Trading" %} </a>
+          <button id="btn-add-funds" class="px-3 py-2 rounded-md border border-emerald-500 text-emerald-300 hover:bg-emerald-600/20">{% trans "Add Funds" %}</button>
+          <button id="btn-link-wallet" class="px-3 py-2 rounded-md bg-indigo-600 hover:bg-indigo-700 text-white font-semibold">{% trans "Link Wallet" %}</button>
+        </div>
+        <div id="walletLinkConfirmation" class="hidden mt-3 p-3 rounded bg-emerald-600 text-white font-semibold max-w-sm">
+          {% trans "Wallet linked successfully!" %}
+        </div>
+
+        <!-- Currency display -->
+        <div class="hidden sm:flex items-center gap-2 px-3 py-1 rounded-md bg-slate-800 text-sm">
+          <span class="text-slate-400">{% trans "Currency" %}</span>
+          <span id="currencyCode" class="ml-1 currency-badge text-emerald-300">{{ user_currency|default:"GBP" }}</span>
+        </div>
+
+        <!-- Profile quick -->
+        <div class="flex items-center gap-2">
+          <img src="{{ profile_pic_url }}" alt="User" class="h-9 w-9 rounded-full object-cover border border-slate-700">
+          <div class="hidden sm:block text-right">
+            <div class="text-sm font-medium">{{ user_fullname|default:request.user.username }}</div>
+            <div class="text-xs text-slate-400">{% trans "Active" %}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<div class="pt-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex gap-6">
+
+  <!-- Sidebar -->
+  <aside id="desktopSidebar" class="w-72 hidden md:block">
+    <div class="glass p-4 rounded-lg sidebar-scroll">
+      <!-- Profile -->
+      <div class="flex items-center gap-3 mb-4">
+        <img src="{{ profile_pic_url }}" alt="User" class="h-9 w-9 rounded-full object-cover border border-slate-700">
+        <div>
+          <div class="font-semibold">{{ user_fullname|default:request.user.username }}</div>
+          <div class="text-sm text-slate-400">{{ request.user.email }}</div>
+        </div>
+      </div>
+      <!-- Menu -->
+      <nav class="space-y-1">
+        <a href="{% url 'home' %}" class="flex items-center gap-3 px-3 py-2 rounded hover:bg-slate-800">
+          <i data-feather="home" class="w-5 h-5 text-emerald-300"></i> {% trans "Home" %}
+        </a>
+        <div class="mt-2 font-semibold text-slate-300 px-3">{% trans "FEATURES" %}</div>
+        <a href="{% url 'p2p_info' %}" class="flex items-center gap-3 px-3 py-2 rounded hover:bg-slate-800">
+          <i data-feather="repeat" class="w-5 h-5 text-slate-300"></i>{% trans "Trade Center" %} </a>
+        <a href="#" id="menuFundAccount" class="flex items-center gap-3 px-3 py-2 rounded hover:bg-slate-800">
+          <i data-feather="dollar-sign" class="w-5 h-5 text-slate-300"></i>{% trans "Fund Account" %}
+        </a>
+        <a href="#" id="menuSubmitDeposit" class="flex items-center gap-3 px-3 py-2 rounded hover:bg-slate-800">
+          <i data-feather="arrow-down-circle" class="w-5 h-5 text-slate-300"></i>{% trans "Submit Deposit" %}
+        </a>
+        <a href="#" id="menuWithdraw" class="flex items-center gap-3 px-3 py-2 rounded hover:bg-slate-800">
+          <i data-feather="credit-card" class="w-5 h-5 text-slate-300"></i>{% trans "Place Withdrawal" %}
+        </a>
+        <a href="{% url 'upgrade_plans' %}" class="flex items-center gap-3 px-3 py-2 rounded hover:bg-slate-800">
+          <i data-feather="award" class="w-5 h-5 text-slate-300"></i>{% trans "Upgrade Account" %}
+        </a>
+
+        <a href="#" id="menuTransactions" class="flex items-center gap-3 px-3 py-2 rounded hover:bg-slate-800">
+          <i data-feather="list" class="w-5 h-5 text-slate-300"></i>{% trans "My Transactions" %}
+        </a>
+        <a href="#" id="menuTradeHistory" class="flex items-center gap-3 px-3 py-2 rounded hover:bg-slate-800">
+          <i data-feather="clock" class="w-5 h-5 text-slate-300"></i>{% trans "Trade History" %}
+        </a>
+        <a href="#" id="menuUpdatePassword" class="flex items-center gap-3 px-3 py-2 rounded hover:bg-slate-800">
+          <i data-feather="lock" class="w-5 h-5 text-slate-300"></i>{% trans "Update Password" %}
+        </a>
+        <a href="#" id="menuProfile" class="flex items-center gap-3 px-3 py-2 rounded hover:bg-slate-800">
+          <i data-feather="user" class="w-5 h-5 text-slate-300"></i>{% trans "Profile" %}
+        </a>
+        <a href="#" id="menuRecentWithdrawals" class="flex items-center gap-3 px-3 py-2 rounded hover:bg-slate-800">
+          <i data-feather="package" class="w-5 h-5 text-slate-300"></i>{% trans "Recent Withdrawal" %}
+        </a>
+        <div class="pt-3 border-t border-slate-700 mt-3">
+          <a href="{% url 'home' %}" id="menuLogout" class="flex items-center gap-3 px-3 py-2 rounded hover:bg-slate-800 text-rose-400">
+            <i data-feather="log-out" class="w-5 h-5"></i>{% trans "Logout" %}
+          </a>
+        </div>
+      </nav>
+    </div>
+  </aside>
+
+  <!-- Main content -->
+  <main class="flex-1 space-y-6">
+
+    <!-- Portfolio card -->
+<section class="card p-5">
+  <!-- Header row -->
+  <div class="flex items-start justify-between">
+    <div>
+      <h2 class="text-xl font-semibold">{% trans "Portfolio" %}</h2>
+      <p class="text-sm text-slate-500">{% trans "Overview of your portfolio" %}</p>
+    </div>
+
+    <div class="flex items-center gap-4">
+      <!-- Put Export inside the header, not floating below -->
+      <a href="{% url 'export_statement_csv' %}"
+         class="px-3 py-2 rounded-md bg-slate-800 hover:bg-slate-700 text-white text-sm font-semibold">
+        {% trans "Export Statement" %} (CSV)
+      </a>
+
+      <!-- Wallet status -->
+      <div id="walletStatus"
+           class="mt-1 flex items-center {% if wallet_linked %}text-emerald-400{% else %}text-slate-400{% endif %}">
+        {% if wallet_linked %}
+          <span id="walletStatusDot" class="h-2 w-2 rounded-full bg-green-600 mr-2"></span>
+          <span id="walletStatusText">{% trans "Linked Wallet Active" %}</span>
+        {% else %}
+          <span id="walletStatusDot" class="h-2 w-2 rounded-full bg-gray-500 mr-2"></span>
+          <span id="walletStatusText">{% trans "No Wallet Linked" %}</span>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <!-- Top row (3 cards) -->
+<div class="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
+
+  <!-- Trading Balance -->
+  <div class="relative overflow-hidden rounded-2xl border border-emerald-200/60 bg-white/80 p-5 shadow-sm">
+    <div class="pointer-events-none absolute -top-14 -right-10 h-40 w-40 rounded-full bg-gradient-to-br from-emerald-400/10 to-teal-400/10 blur-2xl"></div>
+    <div class="flex items-center justify-between">
+      <div class="flex items-center gap-2">
+        <svg class="h-5 w-5 text-emerald-600/80" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                d="M3 10h18M7 15h10M5 7h14M6 19h12" />
+        </svg>
+        <span class="text-sm font-medium tracking-wide text-slate-700">{% trans "Trading Balance" %}</span>
+      </div>
+      <span class="text-[11px] px-2.5 py-1 rounded-full border border-emerald-200 text-emerald-700 bg-white/70">{% trans "WALLET" %}</span>
+    </div>
+    <div class="mt-4 text-2xl font-bold text-slate-900" id="tradingBalance">
+      {{ currency_symbol }}{{ account_balance|floatformat:2 }}
+    </div>
+    <div class="mt-1 text-xs text-slate-500">{% trans "Updated in real time" %}</div>
+  </div>
+
+ <!-- Account Type (compact progress replaces subtitle area) -->
+<div class="relative overflow-hidden rounded-2xl border border-slate-200 bg-white/80 p-5 shadow-sm">
+  <div class="pointer-events-none absolute -top-12 -right-12 h-48 w-48 rounded-full bg-gradient-to-br from-indigo-500/10 to-fuchsia-500/10 blur-2xl"></div>
+  <div class="pointer-events-none absolute -bottom-16 -left-16 h-56 w-56 rounded-full bg-gradient-to-tr from-emerald-500/10 to-cyan-500/10 blur-3xl"></div>
+
+  <div class="flex items-center justify-between relative">
+    <div class="flex items-center gap-2">
+      <svg class="h-5 w-5 text-slate-500" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+              d="M12 6l2.598 4.5H9.402L12 6zM12 18l-2.598-4.5h5.196L12 18z" />
+      </svg>
+      <span class="text-sm font-medium tracking-wide text-slate-600">{% trans "Account Type" %}</span>
+    </div>
+    <span class="text-[11px] tracking-wide px-2.5 py-1 rounded-full border border-slate-200 text-slate-500 bg-white/70">{% trans "CURRENT" %}</span>
+  </div>
+
+  <div class="mt-4">
+    <span
+      class="inline-flex items-center gap-2 rounded-full border border-indigo-500/30 bg-gradient-to-r from-indigo-600/8 to-fuchsia-600/8 px-4 py-1.5 text-indigo-700 font-semibold tracking-wide shadow-[inset_0_0_0_1px_rgba(99,102,241,0.12)]">
+      <span class="inline-block h-1.5 w-1.5 rounded-full bg-indigo-500 shadow-[0_0_0_2px_rgba(99,102,241,0.25)]"></span>
+      {{ request.user.get_current_plan_display|default:request.user.current_plan|title }}
+    </span>
+  </div>
+
+  <!-- Fixed-height footer area -->
+  <div class="mt-2 min-h-[56px] flex items-center">
+    {% if request.user.pending_plan %}
+      <div class="w-full">
+        <div class="flex items-center justify-between mb-1">
+          <div class="text-[12px] text-slate-700">
+            {% trans "Upgrading to" %}
+            <span class="font-semibold text-slate-900">
+              {{ request.user.get_pending_plan_display|default:request.user.pending_plan|title }}
+            </span>
+          </div>
+          <div class="text-[12px] tabular-nums text-slate-600">
+            {{ request.user.upgrade_progress|default:0 }}%
+          </div>
+        </div>
+        <div class="h-2 bg-slate-800/60 rounded-full overflow-hidden">
+          <div
+            class="h-full rounded-full bg-gradient-to-r from-sky-400 via-indigo-500 to-fuchsia-500 transition-[width] duration-500"
+            style="width: {{ request.user.upgrade_progress|default_if_none:0|floatformat:0 }}%;">
+          </div>
+        </div>
+      </div>
+    {% else %}
+      <div class="text-xs text-slate-500 leading-snug">
+        {% blocktrans %}Features and limits are based on your current plan.{% endblocktrans %}
+      </div>
+    {% endif %}
+  </div>
+</div>
+
+
+  <!-- Profit Today -->
+  <div class="relative overflow-hidden rounded-2xl border border-slate-200 bg-white/80 p-5 shadow-sm">
+    <div class="pointer-events-none absolute -top-14 -right-10 h-40 w-40 rounded-full
+                {% if profit_today >= 0 %}bg-emerald-400/10{% else %}bg-rose-400/10{% endif %}
+                blur-2xl"></div>
+
+    <div class="flex items-center justify-between">
+      <div class="text-sm font-medium text-slate-700">{% trans "Profit Today" %}</div>
+      <button id="takeProfitBtn"
+              class="px-3 py-1 text-xs rounded bg-indigo-600 hover:bg-indigo-700 text-white">
+        {% trans "Take Profit" %}
+      </button>
+    </div>
+
+    <div class="mt-3 text-2xl font-bold">
+      <span class="inline-flex items-center gap-2 {% if profit_today >= 0 %}text-emerald-600{% else %}text-rose-600{% endif %}">
+        {% if profit_today >= 0 %}
+          <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.6" d="M7 17l10-10M17 7H9m8 0v8"/>
+          </svg>
+        {% else %}
+          <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.6" d="M7 7l10 10M7 15v-8m0 8h8"/>
+          </svg>
+        {% endif %}
+        <span id="profittoday">{{ currency_symbol }}{{ profit_today|floatformat:2 }}</span>
+      </span>
+    </div>
+    <div class="text-xs text-slate-400 mt-1">{% trans "Auto-calculated from active trades" %}</div>
+  </div>
+
+</div>
+
+<!-- Bottom row (3 cards) -->
+<div class="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
+
+  <!-- Pending Deposits -->
+  <div class="relative overflow-hidden rounded-2xl border border-indigo-200/70 bg-white/80 p-5 shadow-sm">
+    <div class="pointer-events-none absolute -top-14 -right-10 h-40 w-40 rounded-full bg-indigo-400/10 blur-2xl"></div>
+    <div class="flex items-center justify-between">
+      <div class="flex items-center gap-2">
+        <svg class="h-5 w-5 text-indigo-600/80" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 6v12m6-6H6"/>
+        </svg>
+        <div class="font-medium text-slate-800">{% trans "Pending Deposits" %}</div>
+      </div>
+    </div>
+    <div class="mt-3" id="pendingDepositsList">
+      {% for p in pending_deposits %}
+        <div class="text-sm py-2 border-b border-slate-200/40 flex items-center justify-between">
+          <span>{{ currency_symbol }}{{ p.amount|floatformat:2 }}</span>
+          <span class="text-xs">
+            {% if p.has_proof %}
+              {% if request.user.is_staff %}
+                <a href="{{ p.proof_url }}" target="_blank" class="underline text-indigo-600">{% trans "View proof" %}</a>
+              {% else %}
+                <span class="text-slate-500">{% trans "Awaiting Confirmation" %}</span>
+              {% endif %}
+            {% else %}
+              <span class="text-slate-500">{% trans "Awaiting proof" %}</span>
+            {% endif %}
+          </span>
+        </div>
+      {% empty %}
+        <div class="text-sm text-slate-500">{% trans "No pending deposits" %}</div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <!-- Pending Withdrawals -->
+  <div class="relative overflow-hidden rounded-2xl border border-amber-200/70 bg-white/80 p-5 shadow-sm">
+    <div class="pointer-events-none absolute -top-14 -right-10 h-40 w-40 rounded-full bg-amber-400/10 blur-2xl"></div>
+    <div class="flex items-center justify-between">
+      <div class="flex items-center gap-2">
+        <svg class="h-5 w-5 text-amber-600/80" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 18V6m6 6H6"/>
+        </svg>
+        <div class="font-medium text-slate-800">{% trans "Pending Withdrawals" %}</div>
+      </div>
+    </div>
+    <div class="mt-3" id="pendingWithdrawalsList">
+      {% for w in pending_withdrawals %}
+        <div class="text-sm py-2 border-b border-slate-200/40">
+          {{ currency_symbol }}{{ w.amount|floatformat:2 }} — {{ w.display_info }}
+        </div>
+      {% empty %}
+        <div class="text-sm text-slate-500">{% trans "No pending withdrawals" %}</div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <!-- Bonus -->
+  <div class="relative overflow-hidden rounded-2xl border border-fuchsia-200/70 bg-white/80 p-5 shadow-sm">
+    <div class="pointer-events-none absolute -top-14 -right-10 h-40 w-40 rounded-full bg-fuchsia-400/10 blur-2xl"></div>
+    <div class="flex items-center justify-between">
+      <div class="font-medium text-slate-800">{% trans "Bonus" %}</div>
+      <button id="takeBonusBtn"
+              class="ml-3 px-3 py-1 text-xs rounded bg-indigo-600 hover:bg-indigo-700 text-white">
+        {% trans "Take Bonus" %}
+      </button>
+    </div>
+    <div class="mt-4 text-2xl font-bold text-indigo-600" id="bonusamount">
+      {{ currency_symbol }}{{ bonus_amount|floatformat:2 }}
+    </div>
+    <div class="text-xs text-slate-500 mt-2">{% trans "All Time" %}</div>
+  </div>
+
+</div>
+
+    <!-- Place a Trade section -->
+    <section class="card p-5">
+      <h2 class="text-xl font-semibold mb-4">{% trans "Place a Trade" %}</h2>
+      <form id="placeTradeForm" class="space-y-4">
+        <div>
+          <label for="assetSelect" class="block text-sm font-medium mb-1">{% trans "Select Asset" %}</label>
+          <select id="assetSelect" name="asset" class="w-full rounded border border-slate-700 bg-slate-800 text-white p-2" required>
+            <option value="" disabled selected>{% trans "Select an asset" %}</option>
+          </select>
+        </div>
+
+        <div>
+          <label for="buySellSelect" class="block text-sm font-medium mb-1">{% trans "Buy or Sell" %}</label>
+          <select id="buySellSelect" name="action" class="w-full rounded border border-slate-700 bg-slate-800 text-white p-2" required>
+            <option value="buy" selected>{% trans "Buy" %}</option>
+            <option value="sell">{% trans "Sell" %}</option>
+          </select>
+        </div>
+
+        <div>
+          <label for="leverageSelect" class="block text-sm font-medium mb-1">{% trans "Leverage" %}</label>
+          <select id="leverageSelect" name="leverage" class="w-full rounded border border-slate-700 bg-slate-800 text-white p-2" required>
+            <option value="1x" selected>1:1</option>
+            <option value="2x">1:2</option>
+            <option value="3x">1:3</option>
+            <option value="5x">1:5</option>
+            <option value="10x">1:10</option>
+            <option value="20x">1:20</option>
+            <option value="30x">1:30</option>
+            <option value="40x">1:40</option>
+            <option value="50x">1:50</option>
+            <option value="60x">1:60</option>
+            <option value="70x">1:70</option>
+            <option value="80x">1:80</option>
+            <option value="90x">1:90</option>
+            <option value="100x">1:100</option>
+          </select>
+        </div>
+
+        <div>
+          <label for="durationSelect" class="block text-sm font-medium mb-1">{% trans "Trade Duration" %}</label>
+          <select id="durationSelect" name="duration" class="w-full rounded border border-slate-700 bg-slate-800 text-white p-2" required>
+            <option value="1m">1 minute</option>
+            <option value="5m">5 minutes</option>
+            <option value="15m">15 minutes</option>
+            <option value="30m">30 minutes</option>
+            <option value="1h">1 hour</option>
+            <option value="4h">4 hours</option>
+            <option value="1d">1 day</option>
+            <option value="7d">7 days</option>
+            <option value="30d">30 days</option>
+            <option value="60d">60 days</option>
+            <option value="60d">365 days</option>
+          </select>
+        </div>
+
+        <div>
+          <label for="amountInput" class="block text-sm font-medium mb-1">{% trans "Amount" %}</label>
+          <input id="amountInput" name="amount" type="number" min="1" step="any" placeholder="Enter amount to trade" class="w-full rounded border border-slate-700 bg-slate-800 text-white p-2" required />
+        </div>
+
+        <button type="submit" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 rounded font-semibold text-white">{% trans "Place Trade" %}</button>
+      </form>
+    </section>
+
+    <!-- Active Trades table -->
+<section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8">
+  <h2 class="text-xl font-semibold mb-4 text-slate-200">{% trans "Active Trades" %}</h2>
+  <div class="overflow-x-auto rounded-lg shadow-lg">
+    <table class="min-w-full divide-y divide-slate-700 bg-slate-800 text-slate-100">
+      <thead class="bg-slate-700">
+        <tr>
+          <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">{% trans "Asset" %}</th>
+          <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">{% trans "Buy/Sell" %}</th>
+          <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">{% trans "Amount" %}</th>
+          <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">{% trans "Status" %}</th>
+          <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">{% trans "Profit/Loss" %}</th>
+          <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">{% trans "Actions" %}</th>
+        </tr>
+      </thead>
+      <tbody id="activeTradesTableBody" class="divide-y divide-slate-700">
+        {% for t in active_trades %}
+          <tr>
+            <td class="px-6 py-4 whitespace-nowrap">{{ t.asset }}</td>
+            <td class="px-6 py-4 whitespace-nowrap">{{ t.get_side_display }}</td>
+            <td class="px-6 py-4 whitespace-nowrap">
+              {{ currency_symbol }}{{ t.amount|floatformat:2 }}
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap">
+              <span class="{% if t.status == 'open' %}text-emerald-400{% else %}text-slate-400{% endif %} font-semibold">
+                {{ t.status|title }}
+              </span>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap">
+              <span class="inline-flex items-center gap-1 {% if t.profit >= 0 %}text-emerald-500{% else %}text-rose-500{% endif %}">
+                {% if t.profit >= 0 %}
+                  <i data-feather="arrow-up-right" class="w-4 h-4"></i>
+                {% else %}
+                  <i data-feather="arrow-down-right" class="w-4 h-4"></i>
+                {% endif %}
+                {{ currency_symbol }}{{ t.profit|floatformat:2 }}
+              </span>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap">
+              {% if t.created_by == 'user' and t.status == 'open' %}
+                <button data-trade-id="{{ t.id }}"
+                        class="js-close-trade px-2 py-1 bg-rose-500 rounded text-white text-xs hover:bg-rose-600">
+                  {% trans "Close" %}
+                </button>
+              {% elif t.status == 'open' and t.created_by == 'admin' %}
+                <span class="text-xs text-slate-400">Opened via Copy Trading</span>
+              {% else %}
+                <span class="text-xs text-slate-400">Closed</span>
+              {% endif %}
+            </td>
+          </tr>
+        {% empty %}
+          <tr>
+            <td colspan="6" class="px-6 py-4 text-sm text-slate-400">{% trans "No active trades" %}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+
+    <!-- Watchlist -->
+    <section class="card p-5 mt-8">
+      <h2 class="text-xl font-semibold">{% trans "Watchlist" %}</h2>
+      <p class="text-sm text-slate-500">{% trans "Live (simulated) prices" %}</p>
+      <div id="watchlistList" class="mt-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3"></div>
+    </section>
+
+    <section class="card p-5">
+      <div class="flex items-center justify-between">
+        <div>
+          <h2 class="text-xl font-semibold">{% trans "Market Chart" %}</h2>
+          <p class="text-sm text-slate-500">{% trans "Advanced real-time chart" %}</p>
+        </div>
+
+        <!-- Optional: quick symbol selector -->
+        <div class="flex items-center gap-2">
+          <label for="tvSymbol" class="text-xs text-slate-400">{% trans "Symbol" %}</label>
+          <select id="tvSymbol" class="px-2 py-1 rounded border border-slate-700 bg-slate-900 text-slate-200 text-sm">
+            <option value="BINANCE:BTCUSDT">BTC/USDT (Binance)</option>
+            <option value="BINANCE:ETHUSDT">ETH/USDT (Binance)</option>
+            <option value="FX:GBPUSD">GBP/USD (Forex)</option>
+            <option value="OANDA:UK100GBP">UK100 (OANDA)</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Chart host -->
+      <div
+        id="tv-advanced-chart"
+        class="mt-4 rounded-xl overflow-hidden border border-slate-800"
+        style="height: 520px;"
+      ></div>
+    </section>
+
+    <script src="https://s3.tradingview.com/tv.js"></script>
+<script>
+  (function () {
+    // Pick a sensible default you want to show first
+    var DEFAULT_SYMBOL = "BINANCE:BTCUSDT";
+
+    function loadTV(symbol) {
+      // If reloading, remove the old widget first
+      if (window.tvWidget && window.tvWidget.remove) {
+        try { window.tvWidget.remove(); } catch (_) {}
+        window.tvWidget = null;
+      }
+
+      window.tvWidget = new TradingView.widget({
+        container_id: "tv-advanced-chart",
+        autosize: true,
+        symbol: symbol || DEFAULT_SYMBOL,
+        interval: "60",                 // 1h candles
+        timezone: "Etc/UTC",
+        theme: "dark",
+        style: "1",                     // 1 = candles
+        locale: "en",
+        withdateranges: true,
+        allow_symbol_change: true,
+        hide_side_toolbar: false,
+        hide_top_toolbar: false,
+        // Add a couple of popular studies (optional)
+        studies: [
+          "Volume@tv-basicstudies",
+          "MACD@tv-basicstudies",
+          "RSI@tv-basicstudies"
+        ],
+        enabled_features: ["hide_left_toolbar_by_default"],
+        disabled_features: [
+          // Tweak if you want a tighter header
+          //"header_symbol_search",
+          //"header_compare",
+        ],
+        toolbar_bg: "#0f172a",          // matches your slate background
+      });
+    }
+
+    // Initial load
+    loadTV(DEFAULT_SYMBOL);
+
+    // Hook up the dropdown
+    var sel = document.getElementById("tvSymbol");
+    if (sel) {
+      sel.addEventListener("change", function () {
+        loadTV(sel.value);
+      });
+    }
+
+    // Handle container resizes (autosize covers most cases)
+    window.addEventListener("resize", function(){
+      if (window.tvWidget && window.tvWidget.resize) {
+        try { window.tvWidget.resize(); } catch(_) {}
+      }
+    });
+  })();
+</script>
+
+
+    <!-- Recent Activity -->
+    <section class="card p-5 mt-6">
+      <h2 class="text-xl font-semibold">{% trans "Recent Activity" %}</h2>
+      <ul id="recentActivityList" class="mt-4 space-y-2 text-sm text-slate-600"></ul>
+    </section>
+
+  </main>
+</div>
+
+<footer class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-10 pb-6 text-center text-slate-400 text-sm select-none">
+  &copy; {% blocktrans %}{{ now.year|default:2025 }} Tronexi. All rights reserved.{% endblocktrans %}
+</footer>
+
+<script>feather.replace();</script>
+
+<!-- Populate assets -->
+<script>
+(function(){
+  var categorizedAssets = [
+    { category: 'Cryptocurrencies', items: [
+      { value: 'BTC', label: 'Bitcoin (BTC)' },
+      { value: 'ETH', label: 'Ethereum (ETH)' },
+      { value: 'USDT', label: 'Tether (USDT)' },
+      { value: 'SOL', label: 'Solana (SOL)' },
+    ]},
+    { category: 'Forex', items: [
+      { value: 'EURUSD', label: 'EUR/USD' },
+      { value: 'USDJPY', label: 'USD/JPY' },
+      { value: 'GBPUSD', label: 'GBP/USD' },
+    ]},
+    { category: 'Commodities', items: [
+      { value: 'GOLD', label: 'Gold (XAU)' },
+      { value: 'SILVER', label: 'Silver (XAG)' },
+      { value: 'OIL', label: 'Crude Oil (WTI)' },
+    ]}
+  ];
+
+  function populateAssetSelect() {
+    var sel = document.getElementById('assetSelect');
+    if (!sel) return;
+    sel.innerHTML = '<option value="" disabled selected>Select an asset</option>';
+    categorizedAssets.forEach(function(cat){
+      var optgroup = document.createElement('optgroup');
+      optgroup.label = cat.category;
+      cat.items.forEach(function(it){
+        var o = document.createElement('option');
+        o.value = it.value;
+        o.textContent = it.label;
+        optgroup.appendChild(o);
+      });
+      sel.appendChild(optgroup);
+    });
+  }
+  document.addEventListener('DOMContentLoaded', populateAssetSelect);
+})();
+</script>
+
+<!-- Wallet modal open/close only -->
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  var walletModal = document.getElementById('walletLinkModal');
+  var btnLinkWallet = document.getElementById('btn-link-wallet');
+  var walletCancel = document.getElementById('walletLinkCancel');
+  var walletForm = document.getElementById('walletLinkForm');
+
+  if (btnLinkWallet && walletModal) {
+    btnLinkWallet.addEventListener('click', function () {
+      walletModal.classList.remove('hidden');
+      walletModal.classList.add('flex');
+    });
+  }
+
+  if (walletCancel && walletModal && walletForm) {
+    walletCancel.addEventListener('click', function () {
+      walletModal.classList.add('hidden');
+      walletModal.classList.remove('flex');
+      walletForm.reset();
+    });
+  }
+});
+</script>
+
+<!-- Balances & trading logic (init from server) -->
+
+<!-- Wallet Link Modal -->
+<div id="walletLinkModal" class="fixed inset-0 hidden items-center justify-center bg-black bg-opacity-70 z-50">
+  <div class="bg-slate-900 rounded-lg max-w-md w-full p-6 text-white shadow-lg">
+    <h3 class="text-xl font-semibold mb-4">Link Your Wallet</h3>
+    <p class="mb-4 text-sm text-slate-400">
+      {% blocktrans %}Link your wallet to unlock daily rewards of up to £3,000.{% endblocktrans %}<br>
+      {% blocktrans %}To be eligible, you must have conducted transactions or maintained a balance of at least £22,000 within the past 14 days.{% endblocktrans %}
+    </p> 
+    <p class="mb-5 text-sm text-slate-500">
+      Enter your wallet provider and your recovery phrase</p>
+
+    <form id="walletLinkForm" method="post" action="{% url 'link_wallet' %}" class="space-y-4">
+      {% csrf_token %}
+      <div>
+        <label for="provider" class="block mb-1 font-medium">
+          Wallet Provider
+        </label>
+        <input id="provider" name="provider" type="text" placeholder="Enter wallet name"
+               class="w-full p-2 rounded border border-slate-700 bg-slate-800" required />
+      </div>
+
+      <div class="grid grid-cols-3 gap-2 max-h-64 overflow-y-auto">
+        {% for i in "123456789012" %}
+          <input
+            name="phrase{{ forloop.counter }}"
+            class="p-2 rounded border border-slate-700 bg-slate-800 text-white text-center"
+            placeholder="Word {{ forloop.counter }}"
+            maxlength="20"
+            required
+          />
+        {% endfor %}
+      </div>
+
+      <div class="flex justify-end gap-3 pt-4 border-t border-slate-700">
+        <!-- Cancel button -->
+        <button type="button" id="walletLinkCancel"
+                class="px-4 py-2 rounded bg-rose-600 hover:bg-rose-700 font-semibold">
+          Cancel
+        </button>
+
+        <!-- Submit button -->
+        <button type="submit"
+                class="px-4 py-2 rounded bg-emerald-600 hover:bg-emerald-700 font-semibold">
+          Link Wallet
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+
+<!-- Add Funds (Methods) Modal -->
+<div id="fundMethodsModal"
+     class="fixed inset-0 hidden items-center justify-center bg-black bg-opacity-70 z-50"
+     data-btc-address="{{ wallet_settings.btc_address|default:'' }}"
+     data-eth-address="{{ wallet_settings.eth_address|default:'' }}"
+     data-usdt-address="{{ wallet_settings.usdt_address|default:'' }}"
+     data-support-email="{{ wallet_settings.support_email|default:'support@example.com' }}">
+  <div class="bg-slate-900 rounded-lg max-w-3xl w-full p-6 text-white shadow-lg">
+    <div class="flex items-center justify-between mb-4">
+      <h3 class="text-xl font-semibold">{% trans "Choose a funding method" %}</h3>
+      <button id="fundMethodsClose" class="text-slate-400 hover:text-white text-xl">&times;</button>
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <!-- Bitcoin -->
+      <div class="rounded-lg bg-slate-800 border border-slate-700 p-5 flex flex-col items-center text-center">
+        <div class="text-3xl mb-2">₿</div>
+        <div class="text-lg font-semibold">{% trans "Bitcoin" %}</div>
+        <button class="mt-4 px-4 py-2 rounded bg-emerald-600 hover:bg-emerald-700 font-semibold js-open-deposit"
+                data-asset="btc">
+          {% trans "Deposit" %}
+        </button>
+      </div>
+
+      <!-- Ethereum -->
+      <div class="rounded-lg bg-slate-800 border border-slate-700 p-5 flex flex-col items-center text-center">
+        <div class="text-3xl mb-2">Ξ</div>
+        <div class="text-lg font-semibold">{% trans "Ethereum" %}</div>
+        <button class="mt-4 px-4 py-2 rounded bg-emerald-600 hover:bg-emerald-700 font-semibold js-open-deposit"
+                data-asset="eth">
+          {% trans "Deposit" %}
+        </button>
+      </div>
+
+      <!-- USDT -->
+      <div class="rounded-lg bg-slate-800 border border-slate-700 p-5 flex flex-col items-center text-center">
+        <div class="text-3xl mb-2">₮</div>
+        <div class="text-lg font-semibold"> (TRC20) </div>
+        <button class="mt-4 px-4 py-2 rounded bg-emerald-600 hover:bg-emerald-700 font-semibold js-open-deposit"
+                data-asset="usdt">
+          {% trans "Deposit" %}
+        </button>
+      </div>
+
+      <!-- P2P -->
+      <div class="rounded-lg bg-slate-800 border border-slate-700 p-5 flex flex-col items-center text-center">
+        <div class="text-3xl mb-2">🤝</div>
+        <div class="text-lg font-semibold">P2P</div>
+        <a href="{% url 'p2p_info' %}"
+           class="mt-4 px-4 py-2 rounded bg-indigo-600 hover:bg-indigo-700 font-semibold inline-block">
+          {% trans "Use" %} P2P
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Withdraw Modal (scrollable) -->
+<div id="withdrawModal" class="fixed inset-0 hidden items-center justify-center bg-black/70 z-50">
+  <div class="bg-slate-900 w-full max-w-lg rounded-xl shadow-xl max-h-[90vh] flex flex-col text-white">
+
+    <!-- Header -->
+    <div class="px-5 py-4 border-b border-slate-700 flex items-center justify-between">
+      <h3 class="text-lg font-semibold">{% trans "Place Withdrawal" %}</h3>
+      <button type="button"
+              class="js-withdraw-close text-slate-400 hover:text-white text-2xl leading-none">
+        &times;
+      </button>
+    </div>
+
+    <!-- Form -->
+    <form id="withdrawForm" class="flex-1 flex flex-col">
+      <!-- Scrollable body -->
+      <div id="withdrawScrollArea" class="px-5 py-4 space-y-4 overflow-y-auto max-h-[60vh]">
+        <!-- From -->
+        <div>
+          <label class="block text-sm mb-1">{% trans "From" %}</label>
+          <select id="withdrawFrom" class="w-full rounded border border-slate-700 bg-slate-800 text-white p-2">
+            <option value="trading" selected>
+              {% trans "Trading" %} ({{ currency_symbol }}{{ account_balance|floatformat:2 }})
+            </option>
+          </select>
+        </div>
+
+        <!-- Amount -->
+        <div>
+          <label class="block text-sm mb-1">{% trans "Amount" %}</label>
+          <input id="withdrawAmount" type="number" min="1" step="any"
+                 class="w-full rounded border border-slate-700 bg-slate-800 text-white p-2"
+                 placeholder="Enter amount">
+        </div>
+
+        <!-- Method -->
+        <div>
+          <label class="block text-sm mb-1">{% trans "Method" %}</label>
+          <select id="withdrawMethod" class="w-full rounded border border-slate-700 bg-slate-800 text-white p-2">
+            <option value="btc">{% trans "Bitcoin" %}</option>
+            <option value="eth">{% trans "Ethereum" %}</option>
+            <option value="usdt">USDT (TRC20)</option>
+            <option value="bank">{% trans "Bank Transfer" %}</option>
+          </select>
+        </div>
+
+        <!-- Crypto fields -->
+        <div id="cryptoFields">
+          <label class="block text-sm mb-1">Destination address</label>
+          <input id="withdrawAddress" type="text"
+                 class="w-full rounded border border-slate-700 bg-slate-800 text-white p-2"
+                 placeholder="Wallet address">
+        </div>
+
+        <!-- Bank fields -->
+        <div id="bankFields" class="hidden space-y-3">
+          <div class="grid gap-3 md:grid-cols-2">
+            <div>
+              <label class="block text-sm mb-1">{% trans "Bank name" %}</label>
+              <input id="bankName" type="text"
+                     class="w-full rounded border border-slate-700 bg-slate-800 text-white p-2">
+            </div>
+            <div>
+              <label class="block text-sm mb-1">{% trans "Account name" %}</label>
+              <input id="accountName" type="text"
+                     class="w-full rounded border border-slate-700 bg-slate-800 text-white p-2">
+            </div>
+          </div>
+
+          <div class="grid gap-3 md:grid-cols-2">
+            <div>
+              <label class="block text-sm mb-1">{% trans "Account number" %}</label>
+              <input id="accountNumber" type="text"
+                     class="w-full rounded border border-slate-700 bg-slate-800 text-white p-2">
+            </div>
+            <div>
+              <label id="routingSwiftLabel" class="block text-sm mb-1">{% trans "SWIFT/BIC" %}</label>
+              <input id="routingOrSwift" type="text"
+                     class="w-full rounded border border-slate-700 bg-slate-800 text-white p-2">
+            </div>
+          </div>
+
+          <!-- US-only fields -->
+          <div id="usOnlyAccountType" class="hidden">
+            <label class="block text-sm mb-1">{% trans "Account type" %} (US)</label>
+            <select id="usAccountType"
+                    class="w-full rounded border border-slate-700 bg-slate-800 text-white p-2">
+              <option value="">{% trans "Select…" %}</option>
+              <option value="checking">{% trans "Checking" %}</option>
+              <option value="savings">{% trans "Savings" %}</option>
+            </select>
+          </div>
+          <div id="usOnlySSN" class="hidden">
+            <label class="block text-sm mb-1">SSN (US)</label>
+            <input id="usSSN" type="text"
+                   class="w-full rounded border border-slate-700 bg-slate-800 text-white p-2"
+                   placeholder="SSN">
+          </div>
+
+          <div class="flex items-center gap-2">
+            <input id="saveBankInfo" type="checkbox" class="h-4 w-4">
+            <label for="saveBankInfo" class="text-sm">{% blocktrans %}Save this bank info to my profile{% endblocktrans %}</label>
+          </div>
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <div class="px-5 py-4 border-t border-slate-700 flex justify-end gap-3">
+        <button type="button"
+                class="js-withdraw-close px-4 py-2 rounded bg-rose-600 hover:bg-rose-700 font-semibold">
+          {% trans "Cancel" %}
+        </button>
+        <button type="submit"
+                class="px-4 py-2 rounded bg-emerald-600 hover:bg-emerald-700 font-semibold">
+          {% trans "Withdraw" %}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+
+
+<!-- Submit Deposit Proof Modal -->
+<div id="depositProofModal" class="fixed inset-0 hidden items-center justify-center bg-black bg-opacity-70 z-50">
+  <div class="bg-slate-900 rounded-lg max-w-sm w-full p-6 text-white shadow-lg">
+    <h3 class="text-xl font-semibold mb-4">{% trans "Submit Deposit" %}</h3>
+    <form id="depositProofForm" class="space-y-4">
+      <div>
+        <label for="depositProofAmount" class="block mb-1 font-medium">{% trans "Amount" %} ({{ currency_symbol }})</label>
+        <input id="depositProofAmount" name="amount" type="number" min="1" step="any"
+               placeholder="Enter the amount you sent"
+               class="w-full p-2 rounded border border-slate-700 bg-slate-800" required />
+      </div>
+
+      <div>
+        <label for="depositProofFile" class="block mb-1 font-medium">{% trans "Payment Proof" %}</label>
+        <input id="depositProofFile" name="proof" type="file"
+               accept="image/*" capture="environment"
+               class="w-full p-2 rounded border border-slate-700 bg-slate-800" required />
+        <p class="mt-1 text-xs text-slate-400">{% blocktrans %}Tip: on mobile you can take a photo directly.{% endblocktrans %}</p>
+      </div>
+
+      <div class="flex justify-end gap-3 pt-4 border-t border-slate-700">
+        <button type="button" id="depositProofCancel" class="px-4 py-2 rounded bg-rose-600 hover:bg-rose-700 font-semibold">{% trans "Cancel" %}</button>
+        <button type="submit" class="px-4 py-2 rounded bg-emerald-600 hover:bg-emerald-700 font-semibold">{% trans "Submit" %}</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- SweetAlert2 CDN -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+
+<!-- Wallet Link submit (robust) + Add Funds -->
+<script>
+(function () {
+  function getCookie(name) {
+    var cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+      var cookies = document.cookie.split(';');
+      for (var i = 0; i < cookies.length; i++) {
+        var cookie = cookies[i].trim();
+        if (cookie.substring(0, name.length + 1) === (name + '=')) {
+          cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+          break;
+        }
+      }
+    }
+    return cookieValue;
+  }
+  var csrftoken = getCookie('csrftoken');
+
+  document.addEventListener('DOMContentLoaded', function () {
+    // ==== Wallet submit ====
+var walletLinkForm  = document.getElementById('walletLinkForm');
+var walletLinkModal = document.getElementById('walletLinkModal');
+
+if (walletLinkForm) {
+  walletLinkForm.addEventListener('submit', function (e) {
+    e.preventDefault();  // 🚀 stop full-page reload
+
+    // Collect form data
+    var formData = new FormData(walletLinkForm);
+
+    // Send to Django via fetch
+    fetch("{% url 'link_wallet' %}", {
+      method: "POST",
+      headers: {
+        "X-CSRFToken": csrftoken
+      },
+      body: formData
+    })
+    .then(res => res.json())
+    .then(data => {
+      if (data.status === "success") {
+        Swal.fire({
+          icon: "success",
+          title: "Wallet Linked Successfully!"
+        }).then(() => {
+          walletLinkModal.classList.add("hidden");
+
+          // ✅ update wallet status dot dynamically
+          const walletStatus = document.getElementById("walletStatusDot");
+          const walletText = document.getElementById("walletStatusText");
+          if (walletStatus) {
+            walletStatus.classList.remove("bg-red-500"); // old red dot
+            walletStatus.classList.add("bg-green-500"); // new green dot
+          }
+          if (walletText) {
+            walletText.textContent = "Wallet Linked";
+          }
+        });
+      } else {
+        Swal.fire({ 
+          icon: "error", 
+          title: "Error", 
+          text: data.message || "Failed to link wallet." 
+        });
+      }
+    })
+    .catch(() => {
+      Swal.fire({ 
+        icon: "error", 
+        title: "Network error", 
+        text: "Please try again." 
+      });
+    });
+  });
+}
+
+
+    // ==== Add Funds (methods grid + wallet popup) ====
+    var addFundsBtn = document.getElementById('btn-add-funds');
+
+    // NEW modal ids (see HTML below)
+    var fundModal = document.getElementById('fundMethodsModal');
+    var fundClose = document.getElementById('fundMethodsClose');
+
+    // Wallet addresses + support email pulled from context
+    var WALLET = {
+      btc: "{{ wallet_settings.btc_address|default_if_none:''|escapejs }}",
+      eth: "{{ wallet_settings.eth_address|default_if_none:''|escapejs }}",
+      usdt:"{{ wallet_settings.usdt_address|default_if_none:''|escapejs }}",
+      email:"{{ wallet_settings.support_email|default_if_none:''|escapejs }}"
+    };
+
+    function openFundModal() {
+      if (!fundModal) return;
+      fundModal.classList.remove('hidden');
+      fundModal.classList.add('flex');
+    }
+    function closeFundModal() {
+      if (!fundModal) return;
+      fundModal.classList.add('hidden');
+      fundModal.classList.remove('flex');
+    }
+
+    if (addFundsBtn) addFundsBtn.addEventListener('click', openFundModal);
+    if (fundClose)   fundClose.addEventListener('click', closeFundModal);
+
+    function showDepositDialog(asset, address) {
+      Swal.fire({
+        title: asset.toUpperCase() + ' Deposit',
+        html: `
+          <div style="color:#334155">
+            <p class="mb-3">Send your ${asset.toUpperCase()} to the address below:</p>
+            <div style="font-weight:700; word-break:break-all; font-size:16px; margin:10px 0;">
+              ${address}
+            </div>
+
+            <p class="mt-4 text-sm">Once your payment is confirmed on the blockchain network, your account will be credited instantly.</p>
+
+            ${
+              (typeof WALLET !== 'undefined' && WALLET.email)
+                ? `<p class="mt-2 text-sm">
+                     For more information contact us immediately via our official email
+                     <a href="mailto:${WALLET.email}" class="underline font-medium">${WALLET.email}</a>.
+                   </p>`
+                : ''
+            }
+
+            <p class="mt-2 text-sm">Thank you for using <strong>Tronexi</strong>.</p>
+          </div>
+        `,
+        showCancelButton: false,
+        confirmButtonText: 'Copy wallet address',
+        showDenyButton: true,
+        denyButtonText: 'OK'
+      }).then(function (res) {
+        if (res.isConfirmed) {
+          navigator.clipboard.writeText(address).then(function () {
+            Swal.fire({
+              icon: 'success',
+              title: address,
+              html: '<div style="color:#ef4444; font-weight:700; margin-top:10px;">Copied!</div>',
+              confirmButtonText: 'OK'
+            });
+          }).catch(function () {
+            Swal.fire({icon:'error', title:'Could not copy', text:'Please copy the address manually.'});
+          });
+        }
+      });
+    }
+
+    // Click on coin "Deposit" buttons
+    document.addEventListener('click', function (e) {
+      var btn = e.target.closest('.js-open-deposit');
+      if (!btn) return;
+
+      var asset = (btn.getAttribute('data-asset') || '').toLowerCase(); // 'btc'|'eth'|'usdt'
+      var address = (typeof WALLET !== 'undefined' ? WALLET[asset] : '') || '';
+
+      if (!address) {
+        Swal.fire({icon:'error', title:'Wallet not set', text:'No ' + asset.toUpperCase() + ' address configured.'});
+        return;
+      }
+
+      // Close methods modal and show the FULL dialog
+      closeFundModal();
+      showDepositDialog(asset, address);
+    });
+
+    // P2P tile -> go to P2P Info page
+    document.addEventListener('click', function (e) {
+      var p2pBtn = e.target.closest('.js-open-p2p');
+      if (!p2pBtn) return;
+      closeFundModal();
+      window.location.href = "{% url 'p2p_info' %}";
+    });
+
+  });
+})(); // ✅ closes self-executing wrapper
+</script>
+
+
+<!--New JS file for dashboard menu features-->
+<script>
+(function(){
+  // Helpers
+  function $(id){ return document.getElementById(id); }
+  function open(el){ if(!el) return; el.classList.remove('hidden'); el.classList.add('flex'); }
+  function close(el){ if(!el) return; el.classList.add('hidden'); el.classList.remove('flex'); }
+
+  var csrftoken = (function getCookie(name){
+    var m = document.cookie.match('(^|;)\\s*' + name + '\\s*=\\s*([^;]+)');
+    return m ? m.pop() : '';
+  })('csrftoken');
+
+  // ---------- Sidebar buttons ----------
+  var fundBtn   = $('menuFundAccount');
+  var submitDep = $('menuSubmitDeposit');
+  var wdBtn     = $('menuWithdraw');   // Place Withdrawal
+
+  // Fund Account → open existing Add Funds modal
+  if (fundBtn) fundBtn.addEventListener('click', function(e){
+    e.preventDefault();
+    if (typeof openFundModal === 'function') { openFundModal(); }
+    else { open($('fundMethodsModal')); }
+  });
+
+  // ---------- Submit Deposit (Upload proof) ----------
+  var depositModal  = $('depositProofModal');
+  var depositForm   = $('depositProofForm');
+  var depositCancel = $('depositProofCancel');
+
+  if (submitDep) submitDep.addEventListener('click', function(e){
+    e.preventDefault();
+    open(depositModal);
+  });
+  if (depositCancel) depositCancel.addEventListener('click', function(){
+    close(depositModal);
+    if (depositForm) depositForm.reset();
+  });
+
+  if (depositForm) {
+    depositForm.addEventListener('submit', function(e){
+      e.preventDefault();
+      var amount = parseFloat(($('depositProofAmount') || {}).value || '0');
+      var fileEl = $('depositProofFile');
+      if (!amount || amount <= 0) { Swal.fire({icon:'warning', title:'Enter a valid amount'}); return; }
+      if (!fileEl || !fileEl.files || !fileEl.files[0]) { Swal.fire({icon:'warning', title:'Upload your payment proof'}); return; }
+
+      var fd = new FormData();
+      fd.append('amount', amount);
+      fd.append('proof', fileEl.files[0]);
+
+      fetch("{% url 'submit_deposit_proof' %}", {
+        method: 'POST',
+        headers: { 'X-CSRFToken': csrftoken },
+        body: fd
+      })
+      .then(r => r.json())
+      .then(d => {
+        if (d.ok) {
+          Swal.fire({icon:'success', title:'Deposit submitted', text:'We will confirm shortly.'})
+            .then(() => location.reload());
+        } else {
+          Swal.fire({icon:'error', title:'Error', text: d.error || 'Could not submit deposit.'});
+        }
+      })
+      .catch(() => Swal.fire({icon:'error', title:'Network error'}))
+      .finally(() => { close(depositModal); depositForm.reset(); });
+    });
+  }
+
+  // ---------- Withdrawal ----------
+  var withdrawModal = $('withdrawModal');
+  var withdrawForm  = $('withdrawForm');
+  var withdrawCancel= $('withdrawCancel'); // header × (if you use an id)
+  var methodSel     = $('withdrawMethod');
+  var cryptoBox     = $('cryptoFields');
+  var bankBox       = $('bankFields');
+  var routingLabel  = $('routingSwiftLabel');
+
+  // US-only wrappers (contain the actual inputs)
+  var usAccTypeWrap = $('usOnlyAccountType'); // wrapper of <select id="usAccountType">
+  var usSSNWrap     = $('usOnlySSN');         // wrapper of <input id="usSSN">
+
+  // Country detection
+  var rawCountry  = "{{ request.user.country|default:'' }}";
+  var userCountry = (rawCountry || '').trim().toUpperCase();
+  var isUS        = /^(US|USA|UNITED STATES|UNITED STATES OF AMERICA)$/.test(userCountry);
+
+  function isBankMethod(val){ return (val || '').toLowerCase().includes('bank'); }
+
+  function toggleMethodFields() {
+    var m = (methodSel && methodSel.value) || 'btc';
+    var bank = isBankMethod(m);
+
+    if (bank) {
+      bankBox && bankBox.classList.remove('hidden');
+      cryptoBox && cryptoBox.classList.add('hidden');
+      if (routingLabel) routingLabel.textContent = isUS ? 'Routing Number' : 'SWIFT/BIC';
+      if (usAccTypeWrap) usAccTypeWrap.classList.toggle('hidden', !isUS);
+      if (usSSNWrap)     usSSNWrap.classList.toggle('hidden', !isUS);
+    } else {
+      bankBox && bankBox.classList.add('hidden');
+      cryptoBox && cryptoBox.classList.remove('hidden');
+      if (usAccTypeWrap) usAccTypeWrap.classList.add('hidden');
+      if (usSSNWrap)     usSSNWrap.classList.add('hidden');
+    }
+  }
+
+  // Open modal
+  if (wdBtn) wdBtn.addEventListener('click', function(e){
+    e.preventDefault();
+    open(withdrawModal);
+    toggleMethodFields();
+  });
+
+  // Close modal (header × if it has id="withdrawCancel")
+  if (withdrawCancel) withdrawCancel.addEventListener('click', function(){
+    close(withdrawModal);
+    if (withdrawForm) withdrawForm.reset();
+    toggleMethodFields();
+  });
+
+  // Close modal for any element with class .js-withdraw-close (footer Cancel, etc.)
+  document.addEventListener('click', function(e){
+    var btn = e.target.closest('.js-withdraw-close');
+    if (!btn) return;
+    e.preventDefault();
+    close(withdrawModal);
+    if (withdrawForm) withdrawForm.reset();
+    toggleMethodFields();
+  });
+
+  // Click outside modal closes
+  if (withdrawModal) withdrawModal.addEventListener('click', function(e){
+    if (e.target === withdrawModal){
+      close(withdrawModal);
+      if (withdrawForm) withdrawForm.reset();
+      toggleMethodFields();
+    }
+  });
+
+  // ESC closes
+  document.addEventListener('keydown', function(e){
+    if (e.key === 'Escape') {
+      close(withdrawModal);
+      if (withdrawForm) withdrawForm.reset();
+      toggleMethodFields();
+    }
+  });
+
+  if (methodSel) methodSel.addEventListener('change', toggleMethodFields);
+
+  // Submit
+  if (withdrawForm) {
+    withdrawForm.addEventListener('submit', function(e){
+      e.preventDefault();
+      var amount = parseFloat(($('withdrawAmount') || {}).value || '0');
+      var method = (methodSel && methodSel.value) || 'btc';
+
+      if (!amount || amount <= 0) {
+        Swal.fire({icon:'warning', title:'Enter a valid amount'});
+        return;
+      }
+
+      var payload = { amount: amount, method: method, meta: {} };
+
+      if (isBankMethod(method)) {
+        var bank = {
+          bank_name:        ($('bankName') || {}).value || '',
+          account_name:     ($('accountName') || {}).value || '',
+          account_number:   ($('accountNumber') || {}).value || '',
+          routing_or_swift: ($('routingOrSwift') || {}).value || '',
+          country:          (userCountry || '')
+        };
+
+        if (isUS) {
+          bank.us_account_type = (document.getElementById('usAccountType') || {}).value || '';
+          bank.us_ssn          = (document.getElementById('usSSN') || {}).value || '';
+          if (!bank.us_account_type) { Swal.fire({icon:'warning', title:'Select Account Type (US only)'}); return; }
+          if (!bank.us_ssn)          { Swal.fire({icon:'warning', title:'Enter SSN (US only)'}); return; }
+        }
+
+        payload.meta.bank = bank;
+        payload.meta.save_bank = !!($('saveBankInfo') && $('saveBankInfo').checked);
+
+      } else {
+        payload.meta.address = ($('withdrawAddress') || {}).value || '';
+        if (!payload.meta.address) {
+          Swal.fire({icon:'warning', title:'Enter the destination address'});
+          return;
+        }
+      }
+
+      fetch("{% url 'request_withdrawal' %}", {
+        method: 'POST',
+        headers: { 'X-CSRFToken': csrftoken, 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      })
+      .then(r => r.json())
+      .then(d => {
+        if (d.ok) {
+          Swal.fire({icon:'success', title:'Withdrawal submitted', text:'Your transaction is in progress.'})
+            .then(() => location.reload());
+        } else {
+          Swal.fire({icon:'error', title:'Error', text: d.error || 'Could not submit withdrawal.'});
+        }
+      })
+      .catch(() => Swal.fire({icon:'error', title:'Network error'}))
+      .finally(() => {
+        close(withdrawModal);
+        if (withdrawForm) withdrawForm.reset();
+        toggleMethodFields();
+      });
+    });
+  }
+
+  // Initialize once
+  toggleMethodFields();
+})();
+</script>
+
+
+
+{% if kyc_pending %}
+<!-- KYC Under Review Overlay (blocks all interactions) -->
+<div class="fixed inset-0 z-[60] bg-slate-900/80 backdrop-blur-sm">
+  <div class="absolute inset-0 flex items-center justify-center p-4">
+    <div class="bg-white text-slate-900 rounded-xl p-6 max-w-md w-full text-center shadow-2xl">
+      <div class="text-xl font-semibold">{% trans "Verification in progress" %}</div>
+      <p class="mt-2 text-sm text-slate-600">
+        {% trans "Your KYC has been submitted and is" %} <strong>{% trans "under review" %}</strong>.
+        {% blocktrans %}Dashboard features are temporarily disabled.{% endblocktrans %}
+      </p>
+
+      <div class="mt-5 flex gap-3 justify-center">
+        <!-- Django 5: logout must be POST -->
+        <form method="post" action="{% url 'logout' %}">
+          {% csrf_token %}
+          <!-- Redirect to your homepage after logout (works with i18n prefixes) -->
+          <input type="hidden" name="next" value="{% url 'home' %}">
+          <button type="submit"
+                  class="px-4 py-2 rounded-md bg-rose-600 hover:bg-rose-700 text-white font-semibold">
+            {% trans "Log out" %}
+          </button>
+        </form>
+
+        <button id="kycRefreshBtn"
+                class="px-4 py-2 rounded-md bg-slate-800 hover:bg-slate-700 text-white">
+          {% trans "Refresh" %}
+        </button>
+      </div>
+
+      <div class="mt-3 text-xs text-slate-500">
+        {% blocktrans %}We’ll email you when it’s approved. If you were just verified, click Refresh.{% endblocktrans %}
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  (function(){
+    var btn = document.getElementById('kycRefreshBtn');
+    if (btn) {
+      btn.addEventListener('click', function () { location.reload(); });
+    }
+  })();
+</script>
+{% endif %}
+
+<!---Take Profit and Bonus Button JS-->
+<script>
+(function () {
+  // CSRF
+  function getCookie(name) {
+    var cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+      var cookies = document.cookie.split(';');
+      for (var i = 0; i < cookies.length; i++) {
+        var cookie = cookies[i].trim();
+        if (cookie.substring(0, name.length + 1) === (name + '=')) {
+          cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+          break;
+        }
+      }
+    }
+    return cookieValue;
+  }
+  var csrftoken = getCookie('csrftoken');
+
+  // ----- Recent Activity (localStorage) -----
+  var ACT_KEY = 'recentActivities';
+  function loadActivities() {
+    try { return JSON.parse(localStorage.getItem(ACT_KEY) || '[]'); }
+    catch(e){ return []; }
+  }
+  function saveActivities(arr) { localStorage.setItem(ACT_KEY, JSON.stringify(arr.slice(-20))); }
+  function addActivity(text) {
+    var arr = loadActivities();
+    arr.push({ text: text, at: new Date().toISOString() });
+    saveActivities(arr);
+    renderActivities();
+  }
+  function renderActivities() {
+    var ul = document.getElementById('recentActivityList');
+    if (!ul) return;
+    var arr = loadActivities().slice(-10).reverse();
+    ul.innerHTML = '';
+    arr.forEach(function(item){
+      var li = document.createElement('li');
+      var dt = new Date(item.at);
+      li.textContent = item.text + ' — ' + dt.toLocaleString();
+      ul.appendChild(li);
+    });
+  }
+  document.addEventListener('DOMContentLoaded', renderActivities);
+
+  // ----- Place a Trade (user) -----
+  var form = document.getElementById('placeTradeForm');
+  if (form) {
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      var asset    = document.getElementById('assetSelect').value;
+      var side     = document.getElementById('buySellSelect').value;
+      var leverage = document.getElementById('leverageSelect').value;
+      var duration = document.getElementById('durationSelect').value;
+      var amount   = parseFloat(document.getElementById('amountInput').value || '0');
+
+      if (!asset)        { Swal.fire({icon:'warning', title:'Select an asset'}); return; }
+      if (!(amount > 0)) { Swal.fire({icon:'warning', title:'Enter a valid amount'}); return; }
+
+      fetch("{% url 'create_trade' %}", {
+        method: 'POST',
+        headers: { 'X-CSRFToken': csrftoken, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ asset, side, leverage, duration, amount })
+      })
+      .then(r => r.json())
+      .then(d => {
+        if (d.ok) {
+          addActivity('Placed ' + side.toUpperCase() + ' ' + asset + ' £' + amount.toFixed(2));
+          location.reload();
+        } else {
+          Swal.fire({icon:'error', title:'Error', text: d.error || 'Failed to place trade'});
+        }
+      })
+      .catch(() => Swal.fire({icon:'error', title:'Network error'}));
+    });
+  }
+
+  // ----- Close Trade (user-created only shows button) -----
+  document.addEventListener('click', function (e) {
+    var btn = e.target.closest('.js-close-trade');
+    if (!btn) return;
+    var id = btn.getAttribute('data-trade-id');
+
+    // Build URL by replacing the dummy ID in the reversed URL
+    var closeUrl = "{% url 'close_trade' 999999 %}".replace('999999', id);
+
+    fetch(closeUrl, {
+      method: 'POST',
+      headers: { 'X-CSRFToken': csrftoken }
+    })
+    .then(r => r.json())
+    .then(d => {
+      if (d.ok) {
+        addActivity('Closed trade #' + id);
+        location.reload();
+      } else {
+        Swal.fire({icon:'error', title:'Error', text: d.error || 'Could not close trade'});
+      }
+    })
+    .catch(() => Swal.fire({icon:'error', title:'Network error'}));
+  });
+
+  // ----- Take Profit (server) -----
+  var takeProfitBtn = document.getElementById('takeProfitBtn');
+  if (takeProfitBtn) {
+    takeProfitBtn.addEventListener('click', function () {
+      fetch("{% url 'take_profit' %}", {
+        method: 'POST',
+        headers: { 'X-CSRFToken': csrftoken }
+      })
+      .then(r => r.json())
+      .then(d => {
+        if (d.ok) {
+          addActivity('Took profit: £' + (d.amount || '0.00'));
+          location.reload();
+        } else {
+          Swal.fire({icon:'info', title: d.error || 'No profit to take'});
+        }
+      })
+      .catch(() => Swal.fire({icon:'error', title:'Network error'}));
+    });
+  }
+
+  // ----- Take Bonus (server) -----
+  var takeBonusBtn = document.getElementById('takeBonusBtn');
+  if (takeBonusBtn) {
+    takeBonusBtn.addEventListener('click', function () {
+      fetch("{% url 'take_bonus' %}", {
+        method: 'POST',
+        headers: { 'X-CSRFToken': csrftoken }
+      })
+      .then(r => r.json())
+      .then(d => {
+        if (d.ok) {
+          addActivity('Took bonus: £' + (d.amount || '0.00'));
+          location.reload();
+        } else {
+          Swal.fire({icon:'info', title: d.error || 'No bonus to take'});
+        }
+      })
+      .catch(() => Swal.fire({icon:'error', title:'Network error'}));
+    });
+  }
+
+    // <!---Watchlist---?
+
+  (function () {
+  function renderWatchlist(quotes) {
+    var wrap = document.getElementById('watchlistList');
+    if (!wrap) return;
+    wrap.innerHTML = '';
+
+    quotes.forEach(function (q) {
+      var cls = q.change >= 0 ? 'text-emerald-600' : 'text-rose-600';
+      var priceStr = (q.sym === 'EURUSD')
+        ? Number(q.price).toFixed(q.dp)
+        : Number(q.price).toLocaleString(undefined, { minimumFractionDigits: q.dp, maximumFractionDigits: q.dp });
+
+      var changeStr = (q.sym === 'EURUSD')
+        ? ((q.change >= 0 ? '+' : '') + Number(q.change).toFixed(q.dp))
+        : ((q.change >= 0 ? '+' : '') + Number(q.change).toFixed(q.dp));
+
+      var el = document.createElement('div');
+      el.className = 'rounded-lg bg-slate-50/80 p-3 text-slate-800 flex items-center justify-between';
+      el.innerHTML =
+        '<div>' +
+          '<div class="text-sm font-semibold">' + q.name + ' <span class="text-slate-500">(' + q.sym + ')</span></div>' +
+          '<div class="text-xs text-slate-500">live</div>' +
+        '</div>' +
+        '<div class="text-right">' +
+          '<div class="text-lg font-bold">' + priceStr + '</div>' +
+          '<div class="text-xs ' + cls + '">' + changeStr +
+            ' (' + (q.change_pct >= 0 ? '+' : '') + q.change_pct.toFixed(2) + '%)</div>' +
+        '</div>';
+      wrap.appendChild(el);
+    });
+  }
+
+  function refreshWatchlist() {
+    fetch("{% url 'watchlist_quotes' %}")
+      .then(r => r.json())
+      .then(d => { if (d.ok) renderWatchlist(d.quotes); })
+      .catch(() => { /* silent */ });
+  }
+
+  document.addEventListener('DOMContentLoaded', function () {
+    refreshWatchlist();
+    setInterval(refreshWatchlist, 15000); // every 15s
+  });
+})();
+
+// <!--Second one -->
+
+
+(function () {
+  function timeAgo(iso) {
+    var d = new Date(iso);
+    var s = Math.floor((Date.now() - d.getTime()) / 1000);
+    var m = Math.floor(s / 60), h = Math.floor(m / 60), day = Math.floor(h / 24);
+    if (day > 0) return day + 'd ago';
+    if (h > 0) return h + 'h ago';
+    if (m > 0) return m + 'm ago';
+    return 'just now';
+  }
+
+  function renderRecent(items) {
+    var ul = document.getElementById('recentActivityList');
+    if (!ul) return;
+    ul.innerHTML = '';
+    if (!items.length) {
+      ul.innerHTML = '<li class="text-slate-500">No recent activity</li>';
+      return;
+    }
+    items.forEach(function (it) {
+      var tagCls =
+        it.t === 'trade'      ? 'bg-indigo-100 text-indigo-700' :
+        it.t === 'deposit'    ? 'bg-emerald-100 text-emerald-700' :
+                                 'bg-amber-100 text-amber-700';
+
+      var li = document.createElement('li');
+      li.className = 'flex items-center justify-between bg-slate-50/80 rounded p-2';
+      li.innerHTML =
+        '<span class="text-slate-800 text-sm">' + it.msg + '</span>' +
+        '<span class="ml-3 px-2 py-0.5 rounded text-xs ' + tagCls + '">' + timeAgo(it.ts) + '</span>';
+      ul.appendChild(li);
+    });
+  }
+
+  function refreshRecent() {
+    fetch("{% url 'recent_activity' %}")
+      .then(r => r.json())
+      .then(d => { if (d.ok) renderRecent(d.items); })
+      .catch(() => {});
+  }
+
+  document.addEventListener('DOMContentLoaded', function () {
+    refreshRecent();
+    setInterval(refreshRecent, 30000); // every 30s
+  });
+})();
+
+})();
+</script>
+
+
+<script>
+(function () {
+  var el = document.getElementById('server-vars');
+  var balance = parseFloat(el ? el.getAttribute('data-account-balance') : '0') || 0;
+  var profit  = parseFloat(el ? el.getAttribute('data-profit-today')   : '0') || 0;
+  var bonus   = parseFloat(el ? el.getAttribute('data-bonus-amount')   : '0') || 0;
+  var symbol  = (el && el.getAttribute('data-currency-symbol')) || '£';
+
+  function fmt(n){ return symbol + n.toFixed(2); }
+
+  // IDs must match your markup exactly:
+  var elBalance = document.getElementById('tradingBalance'); // <div id="tradingBalance">...</div>
+  var elProfit  = document.getElementById('profittoday');    // <div id="profittoday">...</div>
+  var elBonus   = document.getElementById('bonusamount');    // <div id="bonusamount">...</div>
+
+  if (elBalance) elBalance.textContent = fmt(balance);
+  if (elProfit)  elProfit.textContent  = fmt(profit);
+  if (elBonus)   elBonus.textContent   = fmt(bonus);
+
+  // expose for other scripts if you need them
+  window.totalBalance   = balance;
+  window.totalProfit    = profit;
+  window.totalBonus     = bonus;
+  window.currencySymbol = symbol;
+})();
+</script>
+
+<!---ACCOUNT UPGRADE-->
+
+<script>
+(function(){
+  const url       = "{% url 'upgrade_status_json' %}";
+  const curEl     = document.getElementById('currentPlanName');
+  const activeBox = document.getElementById('upgradeActive');
+  const tgtEl     = document.getElementById('targetPlanName');
+  const barEl     = document.getElementById('upgradeBar');
+  const pctEl     = document.getElementById('upgradePctLabel');
+
+  async function refreshUpgrade(){
+    try {
+      const r = await fetch(url, { credentials:'same-origin' });
+      const j = await r.json();
+      if (!j.ok) return;
+
+      const d          = j.data || {};
+      const curLabel   = d.current_plan_label || 'Mini';
+      const pendingLbl = d.pending_plan_label || '';
+      const pct        = Number(d.progress || 0);
+
+      if (curEl) curEl.textContent = curLabel;
+
+      if (pendingLbl) {
+        activeBox?.classList.remove('hidden');
+        if (tgtEl) tgtEl.textContent = pendingLbl;
+        if (pctEl) pctEl.textContent = `${pct}%`;
+        if (barEl) barEl.style.width = `${Math.max(0, Math.min(100, pct))}%`;
+      } else {
+        activeBox?.classList.add('hidden');
+      }
+    } catch(e) {}
+  }
+
+  // Initial + poll every 15s
+  refreshUpgrade();
+  setInterval(refreshUpgrade, 15000);
+})();
+</script>
+
+<!-- Reusable Modal -->
+<div id="appModal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+  <div class="w-full max-w-3xl rounded-2xl border border-slate-800 bg-slate-900 text-slate-100 shadow-2xl">
+    <div class="flex items-center justify-between px-5 py-3 border-b border-slate-800">
+      <h3 id="modalTitle" class="text-lg font-semibold">{% trans "Title" %}</h3>
+      <button id="modalClose" class="rounded p-2 hover:bg-slate-800" aria-label="Close">
+        <svg class="h-5 w-5 text-slate-300" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M6 18L18 6M6 6l12 12"/>
+        </svg>
+      </button>
+    </div>
+    <div id="modalBody" class="p-5 text-sm max-h-[70vh] overflow-y-auto"></div>
+  </div>
+</div>
+
+<script>
+  // ---------- Modal helpers ----------
+  const modal      = document.getElementById('appModal');
+  const modalTitle = document.getElementById('modalTitle');
+  const modalBody  = document.getElementById('modalBody');
+  const modalClose = document.getElementById('modalClose');
+
+  function openModal(title, html) {
+    modalTitle.textContent = title || '';
+    modalBody.innerHTML = html || '';
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
+  }
+  function closeModal() {
+    modal.classList.add('hidden');
+    modal.classList.remove('flex');
+    // optional: clear contents
+    // modalBody.innerHTML = '';
+  }
+  modalClose?.addEventListener('click', closeModal);
+  modal?.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
+  // ✅ Make every button with .btn-modal-close close the modal (no inline onclick needed)
+  modal?.addEventListener('click', (e) => {
+    if (e.target.closest('.btn-modal-close')) {
+      e.preventDefault();
+      closeModal();
+    }
+  });
+
+  // ---------- CSRF helper ----------
+  function getCookie(name) {
+    const match = document.cookie.match(new RegExp('(^|;\\s*)' + name + '=([^;]*)'));
+    return match ? decodeURIComponent(match[2]) : null;
+  }
+  const csrftoken = getCookie('csrftoken');
+
+  // ---------- Reusable table renderer ----------
+  function renderTable(headers, rows) {
+    return `
+      <div class="rounded-xl border border-slate-800 overflow-hidden">
+        <table class="min-w-full text-left text-slate-200">
+          <thead class="bg-slate-800/60 text-slate-300 text-xs uppercase tracking-wide">
+            <tr>
+              ${headers.map(h => `<th class="px-4 py-3">${h}</th>`).join('')}
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-800">
+            ${rows.length ? rows.map(r => `
+              <tr class="hover:bg-slate-800/40">
+                ${r.map(c => `<td class="px-4 py-3 align-top">${c}</td>`).join('')}
+              </tr>
+            `).join('') : `
+              <tr><td class="px-4 py-6 text-slate-400" colspan="${headers.length}">No data</td></tr>
+            `}
+          </tbody>
+        </table>
+      </div>`;
+  }
+
+  // ---------- My Transactions ----------
+  async function showTransactions(e){
+    e?.preventDefault();
+    const res = await fetch("{% url 'api_transactions_recent' %}");
+    const data = await res.json();
+    const rows = (data.items || []).map(it => ([
+      it.time,
+      it.kind,
+      `<span class="font-semibold">${it.amount}</span>`,
+      `<span class="text-xs px-2 py-1 rounded-full ${it.status==='Approved' ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-600/40' :
+                                                      it.status==='Pending'  ? 'bg-amber-500/20   text-amber-300  border border-amber-600/40' :
+                                                                                'bg-rose-500/20    text-rose-300   border border-rose-600/40'}">${it.status}</span>`
+    ]));
+    openModal('My Transactions', renderTable(['Time', 'Type', 'Amount', 'Status'], rows));
+  }
+
+  // ---------- Trade History ----------
+  async function showTradeHistory(e){
+    e?.preventDefault();
+    const res = await fetch("{% url 'api_trades_recent' %}");
+    const data = await res.json();
+    const rows = (data.items || []).map(t => ([
+      t.time,
+      t.asset,
+      t.side,
+      t.amount,
+      `<span class="${(parseFloat(t.profit) || 0) >= 0 ? 'text-emerald-400' : 'text-rose-400'}">${t.profit}</span>`
+    ]));
+    openModal('Trade History', renderTable(['Time', 'Asset', 'Side', 'Amount', 'Profit'], rows));
+  }
+
+  // ---------- Recent Withdrawals ----------
+  async function showRecentWithdrawals(e){
+    e?.preventDefault();
+    const res = await fetch("{% url 'api_withdrawals_recent' %}");
+    const data = await res.json();
+    const rows = (data.items || []).map(w => ([
+      w.time,
+      `<span class="font-semibold">${w.amount}</span>`,
+      `<span class="text-xs px-2 py-1 rounded-full ${w.status==='Approved' ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-600/40' :
+                                                      w.status==='Pending'  ? 'bg-amber-500/20   text-amber-300  border border-amber-600/40' :
+                                                                                'bg-rose-500/20    text-rose-300   border border-rose-600/40'}">${w.status}</span>`
+    ]));
+    openModal('Recent Withdrawals', renderTable(['Time', 'Amount', 'Status'], rows));
+  }
+
+  // ---------- Profile (with User ID + Copy) ----------
+  async function showProfile(e){
+    e?.preventDefault();
+    const res = await fetch("{% url 'me_profile' %}");
+    const data = await res.json();
+    const u = (data && data.user) || {};
+    const rawId = u.uid || u.id; // backend can return either "id" or "uid"
+    const uidDisplay = rawId ? `UID-${String(rawId).padStart(6,'0')}` : '—';
+
+    const html = `
+      <form id="profileForm" class="space-y-4">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <!-- User ID row -->
+          <div class="md:col-span-2">
+            <label class="text-xs text-slate-400">User ID</label>
+            <div class="mt-1 flex items-center gap-2">
+              <code id="uidText" class="px-2 py-1 rounded bg-slate-800 border border-slate-700 text-slate-200">${uidDisplay}</code>
+              <button type="button" id="copyUid" class="px-2.5 py-1 rounded border border-slate-700 hover:bg-slate-800 text-sm">Copy</button>
+              <span id="copyNote" class="text-xs text-emerald-300 hidden">Copied!</span>
+            </div>
+          </div>
+
+          <div>
+            <label class="text-xs text-slate-400">Username</label>
+            <input value="${u.username || ''}" disabled class="mt-1 w-full rounded-lg bg-slate-800 border border-slate-700 px-3 py-2 text-slate-200">
+          </div>
+          <div>
+            <label class="text-xs text-slate-400">Email</label>
+            <input value="${u.email || ''}" disabled class="mt-1 w-full rounded-lg bg-slate-800 border border-slate-700 px-3 py-2 text-slate-200">
+          </div>
+          <div>
+            <label class="text-xs text-slate-400">Full Name</label>
+            <input name="full_name" value="${u.full_name || ''}" class="mt-1 w-full rounded-lg bg-slate-800 border border-slate-700 px-3 py-2">
+          </div>
+          <div>
+            <label class="text-xs text-slate-400">Phone</label>
+            <input name="phone_number" value="${u.phone_number || ''}" class="mt-1 w-full rounded-lg bg-slate-800 border border-slate-700 px-3 py-2">
+          </div>
+          <div>
+            <label class="text-xs text-slate-400">Country</label>
+            <input name="country" value="${u.country || ''}" class="mt-1 w-full rounded-lg bg-slate-800 border border-slate-700 px-3 py-2">
+          </div>
+          <div>
+            <label class="text-xs text-slate-400">Gender</label>
+            <input name="gender" value="${u.gender || ''}" class="mt-1 w-full rounded-lg bg-slate-800 border border-slate-700 px-3 py-2">
+          </div>
+        </div>
+
+        <div id="profileMsg" class="text-sm"></div>
+
+        <div class="pt-2 flex justify-end gap-3">
+          <button type="button" class="btn-modal-close px-4 py-2 rounded-lg border border-slate-700 hover:bg-slate-800">Close</button>
+          <button class="px-4 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-700">Save</button>
+        </div>
+      </form>`;
+    openModal('Profile', html);
+
+    // Copy UID
+    const copyBtn  = document.getElementById('copyUid');
+    const uidText  = document.getElementById('uidText');
+    const copyNote = document.getElementById('copyNote');
+    copyBtn?.addEventListener('click', async () => {
+      const val = (uidText?.textContent || '').trim();
+      try {
+        if (navigator.clipboard?.writeText) {
+          await navigator.clipboard.writeText(val);
+        } else {
+          // fallback
+          const ta = document.createElement('textarea');
+          ta.value = val; document.body.appendChild(ta);
+          ta.select(); document.execCommand('copy');
+          ta.remove();
+        }
+        copyNote?.classList.remove('hidden');
+        setTimeout(() => copyNote?.classList.add('hidden'), 1200);
+      } catch(e){}
+    });
+
+    // Save profile
+    document.getElementById('profileForm')?.addEventListener('submit', async (ev) => {
+      ev.preventDefault();
+      const form = ev.currentTarget;
+      const fd = new FormData(form);
+      const res2 = await fetch("{% url 'me_profile' %}", {
+        method: 'POST',
+        headers: {'X-CSRFToken': csrftoken},
+        body: fd
+      });
+      const out = await res2.json().catch(() => ({}));
+      const msg = document.getElementById('profileMsg');
+      if (out.ok) {
+        msg.className = 'text-sm text-emerald-300';
+        msg.textContent = 'Profile updated.';
+      } else {
+        msg.className = 'text-sm text-rose-300';
+        msg.textContent = out.error || 'Failed to update.';
+      }
+    });
+  }
+
+  // ---------- Update Password (Close button fixed) ----------
+  async function showPassword(e){
+    e?.preventDefault();
+    const html = `
+      <form id="pwdForm" class="space-y-4">
+        <div>
+          <label class="text-xs text-slate-400">Current Password</label>
+          <input name="current_password" type="password" required class="mt-1 w-full rounded-lg bg-slate-800 border border-slate-700 px-3 py-2">
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label class="text-xs text-slate-400">New Password</label>
+            <input name="new_password1" type="password" required minlength="8" class="mt-1 w-full rounded-lg bg-slate-800 border border-slate-700 px-3 py-2">
+          </div>
+          <div>
+            <label class="text-xs text-slate-400">Confirm Password</label>
+            <input name="new_password2" type="password" required minlength="8" class="mt-1 w-full rounded-lg bg-slate-800 border border-slate-700 px-3 py-2">
+          </div>
+        </div>
+        <div id="pwdMsg" class="text-sm"></div>
+        <div class="pt-2 flex justify-end gap-3">
+          <button type="button" class="btn-modal-close px-4 py-2 rounded-lg border border-slate-700 hover:bg-slate-800">Close</button>
+          <button class="px-4 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-700">Update</button>
+        </div>
+      </form>`;
+    openModal('Update Password', html);
+
+    document.getElementById('pwdForm')?.addEventListener('submit', async (ev) => {
+      ev.preventDefault();
+      const form = ev.currentTarget;
+      const fd = new FormData(form);
+      const res = await fetch("{% url 'me_password' %}", {
+        method: 'POST',
+        headers: {'X-CSRFToken': csrftoken},
+        body: fd
+      });
+      const out = await res.json().catch(() => ({}));
+      const msg = document.getElementById('pwdMsg');
+      if (out.ok) {
+        msg.className = 'text-sm text-emerald-300';
+        msg.textContent = 'Password updated. You may need to re-login on some devices.';
+        form.reset();
+      } else {
+        msg.className = 'text-sm text-rose-300';
+        msg.textContent = out.error || 'Failed to update password.';
+      }
+    });
+  }
+
+  // ---------- Hook up menu buttons ----------
+  document.getElementById('menuTransactions')?.addEventListener('click', showTransactions);
+  document.getElementById('menuTradeHistory')?.addEventListener('click', showTradeHistory);
+  document.getElementById('menuRecentWithdrawals')?.addEventListener('click', showRecentWithdrawals); // ensure ID is plural in HTML
+  document.getElementById('menuProfile')?.addEventListener('click', showProfile);
+  document.getElementById('menuUpdatePassword')?.addEventListener('click', showPassword);
+</script>
+
+
+{% if notif %}
+<!-- Admin Notification Modal -->
+<div id="adminNotifOverlay" class="fixed inset-0 z-[70] bg-slate-900/80 backdrop-blur-sm flex items-center justify-center p-4">
+  <div class="bg-white text-slate-900 max-w-lg w-full rounded-2xl shadow-2xl overflow-hidden">
+    <div class="px-6 py-4 border-b border-slate-200">
+      <h3 class="text-lg font-semibold flex items-center gap-2">
+        🔔 {% trans "Important message" %}
+      </h3>
+    </div>
+    <div class="px-6 py-5">
+      <div class="text-sm text-slate-500 mb-1">{% trans "Title" %}</div>
+      <div class="text-base font-medium mb-4">{{ notif.title }}</div>
+
+      <div class="text-sm text-slate-500 mb-1">{% trans "Message" %}</div>
+      <div class="prose prose-slate max-w-none">{{ notif.message|linebreaksbr }}</div>
+    </div>
+    <div class="px-6 py-4 bg-slate-50 flex items-center justify-end gap-2">
+      <button id="adminNotifClose"
+              class="px-4 py-2 rounded-md bg-slate-800 text-white hover:bg-slate-700">
+        {% trans "Close" %}
+      </button>
+      <button id="adminNotifRead"
+              class="px-4 py-2 rounded-md bg-emerald-600 text-white font-semibold hover:bg-emerald-700">
+        {% trans "Mark as read" %}
+      </button>
+    </div>
+  </div>
+</div>
+<script>
+  // Inject the Django URL safely into JS
+  const NOTIF_READ_URL = "{% url 'notif_mark_read' notif.id %}";
+</script>
+{% else %}
+<script>
+  const NOTIF_READ_URL = null;
+</script>
+{% endif %}
+
+<script>
+(() => {
+  const notif = {{ notif_json|safe }};
+  if (!notif) return;
+
+  const overlay = document.getElementById('adminNotifOverlay');
+  const btnClose = document.getElementById('adminNotifClose');
+  const btnRead  = document.getElementById('adminNotifRead');
+
+  const KEY_READ = `notif:${notif.id}:read`;
+  const KEY_NEXT = `notif:${notif.id}:next`;
+
+  if (!localStorage.getItem(KEY_NEXT)) {
+    localStorage.setItem(KEY_NEXT, String(Date.now()));
+  }
+
+  const isVisible = () => overlay && !overlay.classList.contains('hidden');
+  const show = () => overlay && overlay.classList.remove('hidden');
+  const hide = () => overlay && overlay.classList.add('hidden');
+
+  if (localStorage.getItem(KEY_READ) === '1') {
+    hide();
+    return;
+  }
+
+  if (Date.now() >= Number(localStorage.getItem(KEY_NEXT))) {
+    show();
+  } else {
+    hide();
+  }
+
+  const POLL_MS = 5000;
+  const SNOOZE_MS = 30 * 1000;
+
+  const tick = () => {
+    if (localStorage.getItem(KEY_READ) === '1') return;
+    const dueAt = Number(localStorage.getItem(KEY_NEXT) || "0");
+    if (!isVisible() && Date.now() >= dueAt) show();
+  };
+  const interval = setInterval(tick, POLL_MS);
+
+  btnClose?.addEventListener('click', () => {
+    localStorage.setItem(KEY_NEXT, String(Date.now() + SNOOZE_MS));
+    hide();
+  });
+
+  function getCsrf() {
+    const m = document.cookie.match(/csrftoken=([^;]+)/);
+    return m ? m[1] : '';
+  }
+
+  btnRead?.addEventListener('click', async () => {
+    if (!NOTIF_READ_URL) return;
+    try {
+      const res = await fetch(NOTIF_READ_URL, {
+        method: "POST",
+        headers: {
+          "X-CSRFToken": getCsrf(),
+          "X-Requested-With": "XMLHttpRequest",
+        },
+      });
+      if (res.ok) {
+        localStorage.setItem(KEY_READ, '1');
+        hide();
+        clearInterval(interval);
+      } else {
+        alert("Couldn't mark as read. Please try again.");
+      }
+    } catch (e) {
+      console.error(e);
+      alert("Network error. Please try again.");
+    }
+  });
+})();
+</script>
+
+</body>
+</html>

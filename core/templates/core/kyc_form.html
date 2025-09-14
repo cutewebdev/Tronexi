@@ -1,0 +1,107 @@
+{% load static %}
+{% load i18n %}
+{% load l10n %}
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>KYC Verification — Tronexi</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    :root { color-scheme: dark; }
+    body{font-family:Poppins,system-ui;background:#0f172a;color:#fff;display:flex;align-items:center;justify-content:center;min-height:100vh;margin:0;padding:24px}
+    .card{background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.08);border-radius:14px;max-width:620px;width:100%;padding:24px;box-shadow:0 10px 30px rgba(0,0,0,.4)}
+    h1{margin:0 0 8px}
+    p{color:#cbd5e1;margin:0 0 18px}
+    label{display:block;margin:12px 0 6px}
+    .row{display:grid;grid-template-columns:1fr;gap:12px}
+    @media (min-width: 520px){ .row{grid-template-columns:1fr 1fr} }
+    input,select{
+      width:100%;padding:10px;border-radius:8px;
+      border:1px solid rgba(255,255,255,.15);
+      background:#111827;color:#fff;appearance:none;
+    }
+    select option{ background:#0b1220; color:#fff; }
+    input::file-selector-button{
+      background:#1f2937;color:#fff;border:1px solid rgba(255,255,255,.2);
+      padding:6px 10px;border-radius:6px;margin-right:10px;cursor:pointer
+    }
+    .hint{font-size:12px;color:#cbd5e1}
+    .btn{width:100%;margin-top:16px;background:#10b981;border:0;border-radius:10px;color:#fff;font-weight:600;padding:12px;cursor:pointer}
+    .err{color:#f87171;margin:10px 0}
+    .hidden{display:none}
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>{% trans "Verify your identity" %}</h1>
+    <p>{% blocktrans %}Submit your KYC. Your dashboard unlocks after approval.{% endblocktrans %}</p>
+
+    {% if messages %}
+      {% for m in messages %}<div class="err">{{ m }}</div>{% endfor %}
+    {% endif %}
+
+    <!-- IMPORTANT: action matches the working view; enctype is required for files -->
+    <form method="post" enctype="multipart/form-data" action="{% url 'kyc_start' %}">
+      {% csrf_token %}
+
+      <label for="full_name">{% trans "Full Name" %}</label>
+      <input id="full_name" name="full_name" type="text" required>
+
+      <div class="row">
+        <div>
+          <label for="state">{% trans "County/Region" %}</label>
+          <input id="state" name="state" type="text" placeholder="e.g. Greater London">
+        </div>
+        <div>
+          <label for="city">{% trans "Town/City" %}</label>
+          <input id="city" name="city" type="text" placeholder="e.g. Croydon">
+        </div>
+      </div>
+
+      <label for="document_type">{% trans "Document Type" %}</label>
+      <select id="document_type" name="document_type" required>
+        <option value="" disabled selected>{% trans "Select document type" %}</option>
+        <option value="passport">{% trans "Passport" %}</option>
+        <option value="drivers_license">{% trans "Driving Licence" %}</option>
+        <option value="id_card">{% trans "BRP / National ID" %}</option>
+      </select>
+
+      <label for="document_number">{% trans "Document Number" %}</label>
+      <input id="document_number" name="document_number" type="text" required>
+
+      <!-- FRONT (for passports, upload the passport here) -->
+      <label for="id_front">{% trans "Upload Front" %} <span class="hint">(or your passport)</span></label>
+      <input id="id_front" name="id_front" type="file" accept=".jpg,.jpeg,.png,.pdf" required>
+
+      <!-- BACK only for non-passport -->
+      <div id="backWrap">
+        <label for="id_back">{% trans "Upload Back" %}</label>
+        <input id="id_back" name="id_back" type="file" accept=".jpg,.jpeg,.png,.pdf">
+      </div>
+
+      <label for="selfie">{% trans "Selfie (optional)" %}</label>
+      <input id="selfie" name="selfie" type="file" accept=".jpg,.jpeg,.png">
+
+      <button class="btn" type="submit">{% trans "Verify Account" %}</button>
+    </form>
+  </div>
+
+  <script>
+    (function(){
+      const sel = document.getElementById('document_type');
+      const backWrap = document.getElementById('backWrap');
+      const backInput = document.getElementById('id_back');
+
+      function sync() {
+        const isPassport = (sel.value === 'passport');
+        backWrap.classList.toggle('hidden', isPassport);
+        backInput.required = !isPassport;   // only required if NOT passport
+        if (isPassport) backInput.value = '';
+      }
+      sel.addEventListener('change', sync); m
+      sync();
+    })();
+  </script>
+</body>
+</html>

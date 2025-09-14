@@ -1,0 +1,234 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-08-05 11:42+0100\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=6; plural=n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 "
+"&& n%100<=10 ? 3 : n%100>=11 && n%100<=99 ? 4 : 5;\n"
+#: .\core\templates\core\home.html:42
+msgid "Welcome to Tronexi"
+msgstr "مرحباً بكم في ترونكسي"
+
+#: .\core\templates\core\home.html:109
+msgid "of Decentralized Trading"
+msgstr "من التجارة اللامركزية"
+
+#: .\core\templates\core\home.html:111
+msgid "Join Tronexi – secure, fast, with access to global P2P traders."
+msgstr "انضم إلى Tronexi - آمن وسريع مع إمكانية الوصول إلى تجار P2P العالميين"
+
+#: .\core\templates\core\home.html:112
+msgid "Get Started"
+msgstr "البدء"
+
+#: .\core\templates\core\home.html:118
+msgid "What Our Users Say"
+msgstr "ما يقوله مستخدمونا"
+
+#: .\core\templates\core\home.html:121
+msgid "Tronexi changed the way I trade. It's fast, secure, and so easy to use."
+msgstr "لقد غيّرت ترونكسي طريقة تداولي. إنها سريعة وآمنة وسهلة الاستخدام."
+
+#: .\core\templates\core\home.html:122
+msgid "– Elsie A."
+msgstr "إلسي أ"
+
+#: .\core\templates\core\home.html:125
+msgid "The escrow system and fast support gave me peace of mind."
+msgstr "لقد أعطاني نظام الضمان والدعم السريع راحة البال."
+
+#: .\core\templates\core\home.html:126
+msgid "– Arnfried K."
+msgstr "أرنفريد ك"
+
+#: .\core\templates\core\home.html:129
+msgid "Best P2P platform I've ever used. Smooth experience!"
+msgstr "أفضل منصة P2P استخدمتها على الإطلاق. تجربة سلسة!"
+
+#: .\core\templates\core\home.html:130
+msgid "– Emily L."
+msgstr "إميلي ل."
+
+#: .\core\templates\core\home.html:153
+msgid "100K+"
+msgstr "أكثر من 100 ألف"
+
+#: .\core\templates\core\home.html:154
+msgid "Active Users"
+msgstr "المستخدمون النشطون"
+
+#: .\core\templates\core\home.html:157
+msgid "$250M+"
+msgstr "أكثر من 250 مليون دولار"
+
+#: .\core\templates\core\home.html:158
+msgid "Volume Traded"
+msgstr "حجم التداول"
+
+#: .\core\templates\core\home.html:161
+#, python-format
+msgid "99.99%"
+msgstr "99.99%"
+
+#: .\core\templates\core\home.html:162
+msgid "Uptime"
+msgstr "وقت التشغيل"
+
+#: .\core\templates\core\home.html:165
+msgid "140+"
+msgstr ""
+
+#: .\core\templates\core\home.html:166
+msgid "Supported Countries"
+msgstr "الدول المدعومة"
+
+#: .\core\templates\core\home.html:173
+msgid "Explore Our Core Features"
+msgstr "استكشف ميزاتنا الأساسية"
+
+#: .\core\templates\core\home.html:177
+msgid "Secure Trading"
+msgstr "التداول الآمن"
+
+#: .\core\templates\core\home.html:178
+msgid "P2P Escrow"
+msgstr "ضمان P2P"
+
+#: .\core\templates\core\home.html:179
+msgid "Vendor System"
+msgstr "نظام البائعين"
+
+#: .\core\templates\core\home.html:180
+msgid "Copy Trading"
+msgstr "نسخ التداول"
+
+#: .\core\templates\core\home.html:186
+msgid "توفر Tronexi تداولًا مشفرًا من البداية إلى النهاية لضمان سلامة بياناتك و"
+"Tronexi provides end-to-end encrypted trading to ensure your data and "
+"transactions remain secure, private, and tamper-proof."
+msgstr "تظل المعاملات آمنة وخاصة ومقاومة للتلاعب."
+
+#: .\core\templates\core\home.html:189
+msgid "يضمن نظام الضمان من نظير إلى نظير لدينا الاحتفاظ بالأموال بأمان حتى"
+"Our peer-to-peer escrow system ensures funds are safely held until both "
+"parties complete their side of the trade."
+msgstr "تستكمل الأطراف جانبها من التجارة."
+
+#: .\core\templates\core\home.html:192
+msgid "كن بائعًا معتمدًا وقم بالبيع لآلاف المستخدمين مباشرةً على"
+"Become a verified vendor and sell to thousands of users directly on the "
+"Tronexi platform with zero hidden fees."
+msgstr "منصة Tronexi بدون رسوم خفية."
+
+#: .\core\templates\core\home.html:195
+msgid "انسخ استراتيجيات أفضل المتداولين تلقائيًا. حدد العمولات ونمو."
+"Copy top traders' strategies automatically. Set commissions and grow "
+"passively while others follow your trades."
+msgstr "بشكل سلبي بينما يتابع الآخرون صفقاتك."
+
+#: .\core\templates\core\home.html:203
+msgid "Crypto Converter"
+msgstr "محول العملات المشفرة"
+
+#: .\core\templates\core\home.html:238
+msgid "Live data via CoinGecko API"
+msgstr "البيانات المباشرة عبر واجهة برمجة تطبيقات CoinGecko"
+
+#: .\core\templates\core\home.html:244
+msgid "Users in 140+ Countries and Regions"
+msgstr "المستخدمون في أكثر من 140 دولة ومنطقة"
+
+#: .\core\templates\core\home.html:254
+msgid "How It Works"
+msgstr "كيف يعمل"
+
+#: .\core\templates\core\home.html:258
+msgid "Sign Up"
+msgstr "اشتراك"
+
+#: .\core\templates\core\home.html:259
+msgid "Create your Tronexi account in just a few steps."
+msgstr "قم بإنشاء حساب Tronexi الخاص بك في بضع خطوات فقط."
+
+#: .\core\templates\core\home.html:263
+msgid "Fund your trading account"
+msgstr "تمويل حساب التداول الخاص بك"
+
+#: .\core\templates\core\home.html:264
+msgid "قم بتمويل حسابك عن طريق إجراء الدفع إلى عنوان المحفظة المذكور المرفق"
+"Fund your account by making payment to the stated wallet address attached to "
+"your account."
+msgstr "حسابك."
+
+#: .\core\templates\core\home.html:268
+msgid "Trade Securely"
+msgstr "التجارة بشكل آمن"
+
+#: .\core\templates\core\home.html:269
+msgid "Use our escrow system to complete your trade safely."
+msgstr "استخدم نظام الضمان الخاص بنا لإكمال تجارتك بأمان."
+
+#: .\core\templates\core\home.html:286
+msgid "Why Tronexi?"
+msgstr "لماذا ترونكسي؟"
+
+#: .\core\templates\core\home.html:301
+msgid "Download the Tronexi App"
+msgstr "تنزيل تطبيق ترونكسي"
+
+#: .\core\templates\core\home.html:302
+msgid "Trade anytime, anywhere. Get the app directly from our website."
+msgstr "تداول في أي وقت ومن أي مكان. حمل التطبيق مباشرةً من موقعنا الإلكتروني."
+
+#: .\core\templates\core\home.html:314
+msgid "Our Partners"
+msgstr "شركاؤنا"
+
+#: .\core\templates\core\home.html:358
+msgid "Quick Links"
+msgstr "روابط سريعة"
+
+#: .\core\templates\core\home.html:360
+msgid "Features"
+msgstr ""
+
+#: .\core\templates\core\home.html:361
+msgid "Testimonials"
+msgstr "سمات"
+
+#: .\core\templates\core\home.html:362
+msgid "Partners"
+msgstr "الشركاء"
+
+#: .\core\templates\core\home.html:363
+msgid "Download App"
+msgstr "تنزيل التطبيق"
+
+#: .\core\templates\core\home.html:369
+msgid "Contact Us"
+msgstr "اتصل بنا"
+
+#: .\core\templates\core\home.html:372
+msgid "UK Headquarters"
+msgstr "المقر الرئيسي في المملكة المتحدة"
+
+#: .\core\templates\core\home.html:376
+msgid "Stay Updated"
+msgstr "ابق على اطلاع"
+
+#: .\core\templates\core\home.html:379
+msgid "Subscribe"
+msgstr "يشترك"

@@ -1,0 +1,13 @@
+{% extends "email/base_email.html" %}
+{% block body %}
+<tr>
+  <td style="padding:24px;">
+    <h1 style="margin:0 0 12px;font-size:20px;color:#e2e8f0;">Deposit Declined</h1>
+    <p style="margin:0 0 12px;line-height:1.6;color:#cbd5e1;">
+      Hi {{ username }}, we couldn’t approve your recent deposit. If you believe this is an error,
+      please contact support via live chat.
+    </p>
+    <p style="margin:0;"><a href="{{ site_url }}" style="color:#60a5fa;text-decoration:none;">Contact support →</a></p>
+  </td>
+</tr>
+{% endblock %}

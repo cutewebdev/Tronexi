@@ -1,0 +1,239 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-08-05 11:46+0100\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+#: .\core\templates\core\home.html:42
+msgid "Welcome to Tronexi"
+msgstr "ยินดีต้อนรับสู่ Tronexi"
+
+#: .\core\templates\core\home.html:109
+msgid "of Decentralized Trading"
+msgstr "แห่งการซื้อขายแบบกระจายอำนาจ"
+
+#: .\core\templates\core\home.html:111
+msgid "Join Tronexi – secure, fast, with access to global P2P traders."
+msgstr "เข้าร่วม Tronexi – ปลอดภัย รวดเร็ว และเชื่อมต่อกับผู้ซื้อขาย P2P ทั่วโลก"
+
+#: .\core\templates\core\home.html:112
+msgid "Get Started"
+msgstr "เริ่มต้น"
+
+#: .\core\templates\core\home.html:118
+msgid "What Our Users Say"
+msgstr "สิ่งที่ผู้ใช้ของเราพูดถึง"
+
+#: .\core\templates\core\home.html:121
+msgid "Tronexi changed the way I trade. It's fast, secure, and so easy to use."
+msgstr "Tronexi เปลี่ยนวิธีการซื้อขายของฉัน มันรวดเร็ว ปลอดภัย และใช้งานง่ายมาก"
+
+#: .\core\templates\core\home.html:122
+msgid "– Elsie A."
+msgstr "– Elsie A."
+
+#: .\core\templates\core\home.html:125
+msgid "The escrow system and fast support gave me peace of mind."
+msgstr "ระบบเอสโครว์และการสนับสนุนที่รวดเร็วทำให้ฉันมั่นใจ"
+
+#: .\core\templates\core\home.html:126
+msgid "– Arnfried K."
+msgstr "– Arnfried K."
+
+#: .\core\templates\core\home.html:129
+msgid "Best P2P platform I've ever used. Smooth experience!"
+msgstr "แพลตฟอร์ม P2P ที่ดีที่สุดที่ฉันเคยใช้ ประสบการณ์ราบรื่น!"
+
+#: .\core\templates\core\home.html:130
+msgid "– Emily L."
+msgstr "– Emily L."
+
+#: .\core\templates\core\home.html:153
+msgid "100K+"
+msgstr "100K+"
+
+#: .\core\templates\core\home.html:154
+msgid "Active Users"
+msgstr "ผู้ใช้งานที่ใช้งานอยู่"
+
+#: .\core\templates\core\home.html:157
+msgid "$250M+"
+msgstr "มากกว่า $250M"
+
+#: .\core\templates\core\home.html:158
+msgid "Volume Traded"
+msgstr "ปริมาณการซื้อขาย"
+
+#: .\core\templates\core\home.html:161
+#, python-format
+msgid "99.99%%"
+msgstr "99.99%%"
+
+#: .\core\templates\core\home.html:162
+msgid "Uptime"
+msgstr "ระยะเวลาให้บริการ"
+
+#: .\core\templates\core\home.html:165
+msgid "140+"
+msgstr "140+"
+
+#: .\core\templates\core\home.html:166
+msgid "Supported Countries"
+msgstr "ประเทศที่รองรับ"
+
+#: .\core\templates\core\home.html:173
+msgid "Explore Our Core Features"
+msgstr "สำรวจฟีเจอร์หลักของเรา"
+
+#: .\core\templates\core\home.html:177
+msgid "Secure Trading"
+msgstr "การซื้อขายที่ปลอดภัย"
+
+#: .\core\templates\core\home.html:178
+msgid "P2P Escrow"
+msgstr "ระบบเอสโครว์ P2P"
+
+#: .\core\templates\core\home.html:179
+msgid "Vendor System"
+msgstr "ระบบผู้ขาย"
+
+#: .\core\templates\core\home.html:180
+msgid "Copy Trading"
+msgstr "คัดลอกการซื้อขาย"
+
+#: .\core\templates\core\home.html:186
+msgid ""
+"Tronexi provides end-to-end encrypted trading to ensure your data and "
+"transactions remain secure, private, and tamper-proof."
+msgstr ""
+"Tronexi ให้บริการการซื้อขายแบบเข้ารหัสจากต้นทางถึงปลายทาง เพื่อความปลอดภัย ความเป็นส่วนตัว และป้องกันการปลอมแปลงข้อมูล"
+
+#: .\core\templates\core\home.html:189
+msgid ""
+"Our peer-to-peer escrow system ensures funds are safely held until both "
+"parties complete their side of the trade."
+msgstr ""
+"ระบบเอสโครว์แบบ P2P ของเรารับประกันว่าทุนจะถูกเก็บไว้อย่างปลอดภัยจนกว่าทั้งสองฝ่ายจะทำธุรกรรมสำเร็จ"
+
+#: .\core\templates\core\home.html:192
+msgid ""
+"Become a verified vendor and sell to thousands of users directly on the "
+"Tronexi platform with zero hidden fees."
+msgstr ""
+"เป็นผู้ขายที่ผ่านการยืนยันและขายสินค้าให้กับผู้ใช้นับพันบนแพลตฟอร์ม Tronexi โดยไม่มีค่าธรรมเนียมแอบแฝง"
+
+#: .\core\templates\core\home.html:195
+msgid ""
+"Copy top traders' strategies automatically. Set commissions and grow "
+"passively while others follow your trades."
+msgstr ""
+"คัดลอกกลยุทธ์ของเทรดเดอร์ชั้นนำโดยอัตโนมัติ กำหนดค่าคอมมิชชัน และเติบโตแบบพาสซีฟเมื่อมีผู้อื่นติดตามการซื้อขายของคุณ"
+
+#: .\core\templates\core\home.html:203
+msgid "Crypto Converter"
+msgstr "เครื่องแปลงคริปโต"
+
+#: .\core\templates\core\home.html:238
+msgid "Live data via CoinGecko API"
+msgstr "ข้อมูลสดผ่าน CoinGecko API"
+
+#: .\core\templates\core\home.html:244
+msgid "Users in 140+ Countries and Regions"
+msgstr "ผู้ใช้งานในกว่า 140 ประเทศและภูมิภาค"
+
+#: .\core\templates\core\home.html:254
+msgid "How It Works"
+msgstr "วิธีการทำงาน"
+
+#: .\core\templates\core\home.html:258
+msgid "Sign Up"
+msgstr "ลงทะเบียน"
+
+#: .\core\templates\core\home.html:259
+msgid "Create your Tronexi account in just a few steps."
+msgstr "สร้างบัญชี Tronexi ของคุณได้ง่ายๆ เพียงไม่กี่ขั้นตอน"
+
+#: .\core\templates\core\home.html:263
+msgid "Fund your trading account"
+msgstr "เติมเงินเข้าสู่บัญชีเทรดของคุณ"
+
+#: .\core\templates\core\home.html:264
+msgid ""
+"Fund your account by making payment to the stated wallet address attached to "
+"your account."
+msgstr ""
+"เติมเงินเข้าบัญชีของคุณโดยชำระไปยังที่อยู่กระเป๋าสตางค์ที่ระบุในบัญชีของคุณ"
+
+#: .\core\templates\core\home.html:268
+msgid "Trade Securely"
+msgstr "ซื้อขายอย่างปลอดภัย"
+
+#: .\core\templates\core\home.html:269
+msgid "Use our escrow system to complete your trade safely."
+msgstr "ใช้ระบบเอสโครว์ของเราเพื่อทำธุรกรรมอย่างปลอดภัย"
+
+#: .\core\templates\core\home.html:286
+msgid "Why Tronexi?"
+msgstr "ทำไมต้อง Tronexi?"
+
+#: .\core\templates\core\home.html:301
+msgid "Download the Tronexi App"
+msgstr "ดาวน์โหลดแอป Tronexi"
+
+#: .\core\templates\core\home.html:302
+msgid "Trade anytime, anywhere. Get the app directly from our website."
+msgstr "ซื้อขายได้ทุกที่ทุกเวลา ดาวน์โหลดแอปได้โดยตรงจากเว็บไซต์ของเรา"
+
+#: .\core\templates\core\home.html:314
+msgid "Our Partners"
+msgstr "พันธมิตรของเรา"
+
+#: .\core\templates\core\home.html:358
+msgid "Quick Links"
+msgstr "ลิงก์ด่วน"
+
+#: .\core\templates\core\home.html:360
+msgid "Features"
+msgstr "คุณสมบัติ"
+
+#: .\core\templates\core\home.html:361
+msgid "Testimonials"
+msgstr "คำรับรอง"
+
+#: .\core\templates\core\home.html:362
+msgid "Partners"
+msgstr "พันธมิตร"
+
+#: .\core\templates\core\home.html:363
+msgid "Download App"
+msgstr "ดาวน์โหลดแอป"
+
+#: .\core\templates\core\home.html:369
+msgid "Contact Us"
+msgstr "ติดต่อเรา"
+
+#: .\core\templates\core\home.html:372
+msgid "UK Headquarters"
+msgstr "สำนักงานใหญ่ในสหราชอาณาจักร"
+
+#: .\core\templates\core\home.html:376
+msgid "Stay Updated"
+msgstr "ติดตามข่าวสาร"
+
+#: .\core\templates\core\home.html:379
+msgid "Subscribe"
+msgstr "สมัครรับข้อมูล"
+

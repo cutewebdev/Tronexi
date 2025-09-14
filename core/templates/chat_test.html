@@ -1,0 +1,239 @@
+{% load i18n %}
+{% load l10n %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>WebSocket Chat Test</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <!-- Tailwind (remove if you already include it globally) -->
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-900 text-slate-100 min-h-screen">
+
+  <header class="border-b border-slate-800 sticky top-0 bg-slate-900/80 backdrop-blur z-40">
+    <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <h1 class="text-lg font-semibold">WebSocket Chat Test</h1>
+      <div id="connBadge" class="text-xs px-2 py-1 rounded-full border border-slate-700 text-slate-300">
+        Connecting…
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <!-- Room / User bar -->
+    <section class="rounded-xl border border-slate-800 bg-slate-900 p-5 mb-6">
+      <div class="grid sm:grid-cols-2 gap-4">
+        <div>
+          <label class="block text-sm text-slate-400 mb-1">Room (tradeId)</label>
+          <input id="roomInput" type="text" value="testroom"
+                 class="w-full rounded border border-slate-800 bg-slate-800 p-2 text-sm outline-none focus:ring-2 focus:ring-indigo-600" />
+        </div>
+        <div>
+          <label class="block text-sm text-slate-400 mb-1">Your Name (optional)</label>
+          <input id="nameInput" type="text" placeholder="e.g. Alice"
+                 class="w-full rounded border border-slate-800 bg-slate-800 p-2 text-sm outline-none focus:ring-2 focus:ring-indigo-600" />
+        </div>
+      </div>
+      <div class="mt-4 flex gap-2">
+        <button id="connectBtn"
+                class="px-3 py-2 rounded bg-indigo-600 hover:bg-indigo-700 font-semibold text-sm">
+          Connect
+        </button>
+        <button id="disconnectBtn"
+                class="px-3 py-2 rounded bg-slate-800 hover:bg-slate-700 border border-slate-700 text-sm">
+          Disconnect
+        </button>
+      </div>
+    </section>
+
+    <!-- Chat panel -->
+    <section class="rounded-xl border border-slate-800 bg-slate-900 p-5 flex flex-col">
+      <div class="flex items-center justify-between mb-3">
+        <h2 class="text-lg font-semibold">Messages</h2>
+        <div id="statusLine" class="text-xs text-slate-400">Status: <span id="statusText">Connecting…</span></div>
+      </div>
+
+      <div id="chat-log"
+           class="flex-1 overflow-y-auto rounded-lg border border-slate-800 bg-slate-950 p-4 space-y-3"
+           style="min-height: 320px;">
+        <!-- Messages appended here -->
+      </div>
+
+      <div class="mt-4 flex items-center gap-2">
+        <input id="chat-message-input" type="text" placeholder="Type your message…"
+               class="flex-1 rounded border border-slate-800 bg-slate-800 text-white p-3 outline-none focus:ring-2 focus:ring-indigo-600">
+        <button id="chat-message-submit"
+                class="px-4 py-3 rounded bg-indigo-600 hover:bg-indigo-700 font-semibold disabled:opacity-50 disabled:cursor-not-allowed">
+          Send
+        </button>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    (function(){
+      // Elements
+      const roomInput   = document.getElementById('roomInput');
+      const nameInput   = document.getElementById('nameInput');
+      const connectBtn  = document.getElementById('connectBtn');
+      const disconnectBtn = document.getElementById('disconnectBtn');
+
+      const chatLog     = document.getElementById('chat-log');
+      const msgInput    = document.getElementById('chat-message-input');
+      const sendBtn     = document.getElementById('chat-message-submit');
+
+      const connBadge   = document.getElementById('connBadge');
+      const statusText  = document.getElementById('statusText');
+
+      let socket = null;
+      let reconnectTimer = null;
+      let backoff = 1000; // start at 1s, max ~10s
+
+      function setBadge(state) {
+        // states: connecting, connected, closed, error
+        const map = {
+          connecting: { text: 'Connecting…', cls: 'text-amber-300 border-amber-400/30' },
+          connected:  { text: 'Connected',   cls: 'text-emerald-300 border-emerald-400/30' },
+          closed:     { text: 'Disconnected',cls: 'text-slate-300 border-slate-600' },
+          error:      { text: 'Error',       cls: 'text-rose-300 border-rose-400/30' }
+        };
+        const m = map[state] || map.closed;
+        connBadge.textContent = m.text;
+        connBadge.className   = 'text-xs px-2 py-1 rounded-full border ' + m.cls;
+        statusText.textContent = m.text;
+        sendBtn.disabled = (state !== 'connected');
+      }
+
+      function appendSystem(msg, kind='info'){
+        const row = document.createElement('div');
+        row.className = 'text-xs';
+        row.innerHTML = `<span class="${kind==='error'?'text-rose-400':'text-amber-400'}">${msg}</span>`;
+        chatLog.appendChild(row);
+        chatLog.scrollTop = chatLog.scrollHeight;
+      }
+
+      function appendMsg(sender, message, mine=false){
+        const row = document.createElement('div');
+        row.className = "flex " + (mine ? "justify-end" : "justify-start");
+
+        const bubble = document.createElement('div');
+        bubble.className = "max-w-[80%] px-3 py-2 rounded-lg text-sm " +
+          (mine
+            ? "bg-indigo-600 text-white rounded-br-none"
+            : "bg-slate-800 text-slate-100 border border-slate-700 rounded-bl-none");
+        const safeSender = sender ? String(sender) : 'User';
+        const safeMsg = String(message || '');
+        bubble.innerHTML = `<span class="block text-[11px] opacity-80 mb-0.5">${safeSender}</span>${safeMsg}`;
+
+        row.appendChild(bubble);
+        chatLog.appendChild(row);
+        chatLog.scrollTop = chatLog.scrollHeight;
+      }
+
+      function socketURL() {
+        const room = (roomInput.value || 'testroom').trim();
+        const proto = (window.location.protocol === 'https:') ? 'wss' : 'ws';
+        return `${proto}://${window.location.host}/ws/chat/${room}/`;
+      }
+
+      function connect() {
+        cleanup(); // ensure previous is closed
+        setBadge('connecting');
+        appendSystem('Connecting…');
+
+        try {
+          socket = new WebSocket(socketURL());
+        } catch (e) {
+          setBadge('error');
+          appendSystem('Failed to create WebSocket.', 'error');
+          scheduleReconnect();
+          return;
+        }
+
+        socket.onopen = function(){
+          setBadge('connected');
+          appendSystem('Connected. You can chat now.');
+          backoff = 1000; // reset backoff
+        };
+
+        socket.onmessage = function(e){
+          try {
+            const data = JSON.parse(e.data);
+            appendMsg(data.sender || 'User', data.message || '', false);
+          } catch (err) {
+            appendSystem('Received malformed message.', 'error');
+          }
+        };
+
+        socket.onerror = function(){
+          setBadge('error');
+          appendSystem('WebSocket error.', 'error');
+        };
+
+        socket.onclose = function(){
+          setBadge('closed');
+          appendSystem('Disconnected.');
+          scheduleReconnect();
+        };
+      }
+
+      function scheduleReconnect() {
+        clearTimeout(reconnectTimer);
+        reconnectTimer = setTimeout(connect, Math.min(backoff, 10000));
+        backoff = Math.min(backoff * 2, 10000);
+      }
+
+      function cleanup(){
+        if (socket && socket.readyState === 1) {
+          socket.close(1000, 'Client navigating');
+        }
+        socket = null;
+        clearTimeout(reconnectTimer);
+      }
+
+      function send() {
+        const message = (msgInput.value || '').trim();
+        if (!message || !socket || socket.readyState !== 1) return;
+        const sender = (nameInput.value || '').trim();
+        socket.send(JSON.stringify({ message, sender }));
+        msgInput.value = '';
+      }
+
+      // UI events
+      connectBtn.addEventListener('click', function(){
+        cleanup();
+        connect();
+      });
+      disconnectBtn.addEventListener('click', function(){
+        cleanup();
+        setBadge('closed');
+      });
+      sendBtn.addEventListener('click', send);
+      msgInput.addEventListener('keydown', function(e){
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          send();
+        }
+      });
+
+      // Auto-connect on load
+      connect();
+    })();
+  </script>
+
+  <!--Start of Tawk.to Script-->
+  <script type="text/javascript">
+    var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date();
+    (function(){
+      var s1=document.createElement("script"),s0=document.getElementsByTagName("script")[0];
+      s1.async=true;
+      s1.src='https://embed.tawk.to/688a2b5d4870571920646522/1j1dripnt';
+      s1.charset='UTF-8';
+      s1.setAttribute('crossorigin','*');
+      s0.parentNode.insertBefore(s1,s0);
+    })();
+  </script>
+  <!--End of Tawk.to Script-->
+</body>
+</html>
