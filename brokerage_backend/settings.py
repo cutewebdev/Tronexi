@@ -10,7 +10,7 @@ SECRET_KEY = os.environ.get("SECRET_KEY", "fallback-secret-key")
 
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.environ.get("DEBUG", "False") == "True"
 
 ALLOWED_HOSTS = ["tronexi.onrender.com", "tronexi.com", "www.tronexi.com", "localhost", "127.0.0.1"]
 
@@ -39,12 +39,18 @@ INSTALLED_APPS = [
 STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
+# Include your app-level static folders
 STATICFILES_DIRS = [
     BASE_DIR / "brokerage_backend" / "static",
+    BASE_DIR / "core" / "static",
 ]
+
+# Whitenoise storage for better caching & compression
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
