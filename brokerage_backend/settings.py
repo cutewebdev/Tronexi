@@ -1,11 +1,12 @@
 from pathlib import Path
 from datetime import timedelta
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-t_z43q&p6yj-eg$hayo89r23gufr*$ae=66u9u*6!_g=&n=dz8'
+SECRET_KEY = os.environ.get("SECRET_KEY", "fallback-secret-key")
 
 
 # SECURITY WARNING: don't run with debug turned on in production!
