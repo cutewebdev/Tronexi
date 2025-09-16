@@ -84,11 +84,20 @@ TEMPLATES = [
 WSGI_APPLICATION = 'brokerage_backend.wsgi.application'
 
 # Database
-DATABASES = {
-    'default': dj_database_url.config(
-        default=os.environ.get("DATABASE_URL")
-    )
-}
+DATABASE_URL = os.environ.get("DATABASE_URL")
+
+if DATABASE_URL:
+    DATABASES = {
+        'default': dj_database_url.config(default=DATABASE_URL)
+    }
+else:
+    # Local fallback to SQLite
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        }
+    }
 
 # Password validation
 AUTH_PASSWORD_VALIDATORS = [
