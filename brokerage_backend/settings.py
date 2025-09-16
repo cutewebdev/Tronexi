@@ -1,6 +1,7 @@
 from pathlib import Path
 from datetime import timedelta
 import dj_database_url
+import dotenv
 import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -63,6 +64,9 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'brokerage_backend.urls'
+
+# Load environment variables from .env file
+dotenv.load_dotenv()
 
 TEMPLATES = [
     {
@@ -145,8 +149,15 @@ ASGI_APPLICATION = 'brokerage_backend.asgi.application'
 
 # Redis for channel layer
 CHANNEL_LAYERS = {
-    "default": {"BACKEND": "channels.layers.InMemoryChannelLayer"}
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [os.environ.get("REDIS_URL")],
+        },
+    },
 }
+
+
 
 
 USE_I18N = True
